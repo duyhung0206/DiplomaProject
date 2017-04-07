@@ -1,0 +1,65 @@
+<layout version="0.1.0">
+
+    <!--Supplier-->
+    <adminhtml_sup_index_index>
+        <reference name="content">
+            <block type="supplier/adminhtml_supplier" name="supplier" />
+        </reference>
+    </adminhtml_sup_index_index>
+    <adminhtml_sup_index_product>
+        <block type="core/text_list" name="root">
+            <block type="supplier/adminhtml_supplier" name="csv_form" template="supplier/supplier/importproduct.phtml" />
+            <block type="supplier/adminhtml_supplier_edit_tab_products" name="furniturestore.supplier.edit.tab.products"/>
+            <block type="adminhtml/widget_grid_serializer" name="related_grid_serializer">
+                <action method="initSerializerBlock">
+                    <grid_block_name>furniturestore.supplier.edit.tab.products</grid_block_name>
+                    <data_callback>getSelectedRelatedProducts</data_callback>
+                    <hidden_input_name>supplier_products</hidden_input_name>
+                    <reload_param_name>supplier_products</reload_param_name>
+                </action>
+                <action method="addColumnInputName">
+                    <input_name>cost</input_name>
+                    <input_name>tax</input_name>
+                    <input_name>discount</input_name>
+                    <input_name>supplier_sku</input_name>
+                </action>
+            </block>
+        </block>
+    </adminhtml_sup_index_product>
+    <adminhtml_sup_index_productgrid>
+        <block type="core/text_list" name="root">
+            <block type="supplier/adminhtml_supplier_edit_tab_products" name="furniturestore.supplier.edit.tab.products"/>
+        </block>
+    </adminhtml_sup_index_productgrid>
+
+
+    <!--Purchase order-->
+    <adminhtml_sup_purchaseorder_index>
+        <reference name="content">
+            <block type="supplier/adminhtml_purchaseorder" name="purchaseorder" />
+        </reference>
+    </adminhtml_sup_purchaseorder_index>
+    <adminhtml_sup_purchaseorder_product>
+        <block type="core/text_list" name="root">
+            <block type="supplier/adminhtml_purchaseorder" name="csv_form" template="supplier/purchaseorder/importproduct.phtml" />
+            <block type="supplier/adminhtml_purchaseorder_edit_tab_products" name="supplier.purchaseorder.edit.tab.products"/>
+            <block type="adminhtml/widget_grid_serializer" name="related_grid_serializer">
+                <action method="initSerializerBlock">
+                    <grid_block_name>supplier.purchaseorder.edit.tab.products</grid_block_name>
+                    <data_callback>getSelectedRelatedProducts</data_callback>
+                    <hidden_input_name>purchaseorder_products</hidden_input_name>
+                    <reload_param_name>purchaseorder_products</reload_param_name>
+                </action>
+                <action method="addColumnInputName">
+                    <input_name>qty_order</input_name>
+                </action>
+            </block>
+        </block>
+    </adminhtml_sup_purchaseorder_product>
+    <adminhtml_sup_purchaseorder_productgrid>
+        <block type="core/text_list" name="root">
+            <block type="supplier/adminhtml_purchaseorder_edit_tab_products" name="supplier.purchaseorder.edit.tab.products"/>
+        </block>
+    </adminhtml_sup_purchaseorder_productgrid>
+
+</layout>

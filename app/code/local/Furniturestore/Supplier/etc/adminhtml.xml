@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <menu>
+        <supplier module="supplier" translate="title">
+            <title>Supplier</title>
+            <sort_order>60</sort_order>
+            <children>
+                <list_supplier module="supplier" translate="title">
+                    <title>Manage supplier</title>
+                    <sort_order>1</sort_order>
+                    <action>adminhtml/sup_index/index</action>
+                </list_supplier>
+                <list_purchaseorder module="supplier" translate="title">
+                    <title>Manage purchase order</title>
+                    <sort_order>2</sort_order>
+                    <action>adminhtml/sup_purchaseorder/index</action>
+                </list_purchaseorder>
+                <settings module="supplier" translate="title">
+                    <title>Settings</title>
+                    <sort_order>1000</sort_order>
+                    <action>adminhtml/system_config/edit/section/supplier</action>
+                </settings>
+            </children>
+        </supplier>
+    </menu>
+    <acl>
+        <resources>
+            <all>
+                <title>Allow Everything</title>
+            </all>
+            <admin>
+                <children>
+                    <supplier translate="title" module="supplier">
+                        <title>Supplier</title>
+                        <sort_order>-100</sort_order>
+                        <children>
+                            <list_supplier translate="title">
+                                <title>Manage supplier</title>
+                                <sort_order>1</sort_order>
+                            </list_supplier>
+                            <list_purchaseorder translate="title">
+                                <title>Manage purchase order</title>
+                                <sort_order>2</sort_order>
+                            </list_purchaseorder>
+                            <settings module="supplier" translate="title">
+                                <title>Settings</title>
+                                <sort_order>1000</sort_order>
+                            </settings>
+                        </children>
+                    </supplier>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>

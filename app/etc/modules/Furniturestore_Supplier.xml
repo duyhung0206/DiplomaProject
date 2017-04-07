@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<config>
+    <modules>
+        <Furniturestore_Supplier>
+            <active>true</active>
+            <codePool>local</codePool>
+        </Furniturestore_Supplier>
+    </modules>
+</config>
