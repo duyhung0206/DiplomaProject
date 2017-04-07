@@ -43,4 +43,13 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Grid extends Mage_Ad
         return parent::_prepareColumns();
     }
 
+    /**
+     * get url for each row in grid
+     *
+     * @return string
+     */
+    public function getRowUrl($row) {
+        return $this->getUrl('*/*/edit', array('id' => $row->getId()));
+    }
+
 }

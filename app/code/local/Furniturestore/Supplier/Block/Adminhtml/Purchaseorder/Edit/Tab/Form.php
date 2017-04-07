@@ -208,7 +208,8 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Edit_Tab_Form extend
         } else {
             $currency = $this->getRequest()->getParam('currency');
         }
-
+//        Zend_Debug::dump($currency);
+//        die('aa');
         $fieldset->addField('shipping_cost', 'text', array(
             'label' => Mage::helper('supplier')->__('Shipping Cost'),
             'required' => true,

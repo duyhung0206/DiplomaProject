@@ -10,7 +10,7 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Edit_Tab_Renderer_Av
 
        	$availableQty = 0 + $stockItem->getQty();
         
-	return '<input name="qty_order" class="input-text" type="text" value=""/><br/>'.Mage::helper('supplier')->__('Current Qty: ') . $availableQty;
+	return '<input name="qty" class="input-text" type="text" value=""/><br/>'.Mage::helper('supplier')->__('Current Qty: ') . $availableQty;
         
 
     }

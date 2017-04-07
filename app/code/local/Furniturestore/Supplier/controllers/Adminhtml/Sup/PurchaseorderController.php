@@ -68,7 +68,7 @@ class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage
             $this->renderLayout();
         } else {
             Mage::getSingleton('adminhtml/session')->addError(
-                Mage::helper('inventorypurchasing')->__('Purchase Order does not exist!')
+                Mage::helper('supplier')->__('Purchase Order does not exist!')
             );
             $this->_redirect('*/*/');
         }
@@ -83,7 +83,7 @@ class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage
         $this->getLayout()->getBlock('related_grid_serializer')->addColumnInputName('tax');
         $this->getLayout()->getBlock('related_grid_serializer')->addColumnInputName('discount');
         $this->getLayout()->getBlock('related_grid_serializer')->addColumnInputName('supplier_sku');
-        $this->getLayout()->getBlock('related_grid_serializer')->addColumnInputName('qty_order');
+        $this->getLayout()->getBlock('related_grid_serializer')->addColumnInputName('qty');
         $this->renderLayout();
         if (Mage::getModel('admin/session')->getData('purchaseorder_product_import')) {
             Mage::getModel('admin/session')->setData('purchaseorder_product_import', null);
@@ -156,6 +156,7 @@ class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage
                     $codeArr = array();
                     Mage::helper('supplier')->parseStr(Mage::helper('supplier')->base64Decode($enCoded), $codeArr);
                     foreach ($codeArr as $codeId => $code) {
+
                         if (in_array($codeId, array('cost_product', 'tax', 'discount'))) {
                             if ($codeId[1]) {
                                 if (!is_numeric($code) || $code < 0) {
@@ -165,7 +166,7 @@ class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage
                                 }
                             }
                         }
-                        if (in_array($codeId, array('qty_order'))) {
+                        if (in_array($codeId, array('qty'))) {
                             if ($codeId[1]) {
                                 if (!is_numeric($code) || $code <= 0) {
                                     $checkProduct = 0;
@@ -185,7 +186,6 @@ class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage
 
     public function saveAction() {
         if ($data = $this->getRequest()->getPost()) {
-            Zend_Debug::dump($data);
             if (!array_key_exists('send_mail', $data)) {
                 $data['send_mail'] = 1;
             }
@@ -218,7 +218,6 @@ class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage
 
             $model->addData($data);
             $model->save();
-
             $purchaseOrderModel = Mage::getModel('supplier/purchaseorder')->load($this->getRequest()->getParam('id'));
 
             if (isset($data['paid_more']) && $data['paid_more']) {
@@ -236,7 +235,6 @@ class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage
                 }
             }
 
-            $model->save();
             $supplier_id = $data['supplier_id'];
             $supplierProducts = Mage::getModel('supplier/product')
                 ->getCollection()
@@ -256,7 +254,6 @@ class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage
                 if (!$this->getRequest()->getParam('id')) {
                     $model->setData('created_by', $admin);
                 }
-                $model->save();
                 $purchaseOrder = Mage::getModel('supplier/purchaseorder')->load($model->getId());
                 $resource = Mage::getSingleton('core/resource');
                 $writeConnection = $resource->getConnection('core_write');
@@ -294,7 +291,7 @@ class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage
                                 $productModel = Mage::getModel('catalog/product')->load($pId);
                                 $productIds[] = $pId;
                                 if ($purchaseorderProductItem->getId()) {
-                                    $codeArr['qty_order'] = ($codeArr['qty_order'] == null) ? 0 : $codeArr['qty_order'];
+                                    $codeArr['qty'] = ($codeArr['qty'] == null) ? 0 : $codeArr['qty'];
                                     $cost = isset($codeArr['cost_product']) ? $codeArr['cost_product'] : $purchaseorderProductItem->getCost();
                                     $tax = isset($codeArr['tax']) ? $codeArr['tax'] : $purchaseorderProductItem->getTax();
                                     $discount = isset($codeArr['discount']) ? $codeArr['discount'] : $purchaseorderProductItem->getDiscount();
@@ -302,15 +299,13 @@ class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage
                                     $countSqlOlds++;
                                     /* Michael 201602 */
                                     if ($data['discount_tax'] == 0) {
-                                        $totalAmounts += $codeArr['qty_order'] * $cost * (1 + $tax / 100 - $discount / 100);
+                                        $totalAmounts += $codeArr['qty'] * $cost * (1 + $tax / 100 - $discount / 100);
                                     } else {
-                                        $totalAmounts += $codeArr['qty_order'] * $cost * (1 - $discount / 100) * (1 + $tax / 100);
+                                        $totalAmounts += $codeArr['qty'] * $cost * (1 - $discount / 100) * (1 + $tax / 100);
                                     }
-                                    Zend_Debug::dump($codeArr['qty_order'] );
-                                    die('1');
-                                    $totalProducts += $codeArr['qty_order'];
+                                    $totalProducts += $codeArr['qty'];
                                     $sqlOlds .= 'UPDATE ' . $installer->getTableName('supplier/purchaseorder_product') . ' 
-                                                                            SET `qty` = \'' . $codeArr['qty_order'] . '\', `tax` = \'' . $tax . '\',`supplier_sku` = \'' . $supplierSku . '\', `cost` = \'' . $cost . '\', `discount` = \'' . $discount . '\'
+                                                                            SET `qty` = \'' . $codeArr['qty'] . '\', `tax` = \'' . $tax . '\',`supplier_sku` = \'' . $supplierSku . '\', `cost` = \'' . $cost . '\', `discount` = \'' . $discount . '\'
                                                                                     WHERE `purchase_order_product_id` =' . $purchaseorderProductItem->getId() . ';';
                                     if ($countSqlOlds == 900) {
                                         $writeConnection->query($sqlOlds);
@@ -323,17 +318,17 @@ class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage
                                     $product_name = $productModel->getName();
                                     $product_sku = $productModel->getSku();
                                     $purchase_order_id = $model->getId();
-                                    $codeArr['qty_order'] = ($codeArr['qty_order'] == null) ? 0 : $codeArr['qty_order'];
-                                    $qty = $codeArr['qty_order'];
+                                    $codeArr['qty'] = ($codeArr['qty'] == null) ? 0 : $codeArr['qty'];
+                                    $qty = $codeArr['qty'];
                                     $cost = $codeArr['cost_product'];
                                     $discount = $codeArr['discount'];
                                     $tax = $codeArr['tax'];
                                     $supplier_sku = $codeArr['supplier_sku'];
                                     /* Michael 201602 */
                                     if ($data['discount_tax'] == 0) {
-                                        $totalAmounts += $codeArr['qty_order'] * $cost * (1 + $tax / 100 - $discount / 100);
+                                        $totalAmounts += $codeArr['qty'] * $cost * (1 + $tax / 100 - $discount / 100);
                                     } else {
-                                        $totalAmounts += $codeArr['qty_order'] * $cost * (1 - $discount / 100) * (1 + $tax / 100);
+                                        $totalAmounts += $codeArr['qty'] * $cost * (1 - $discount / 100) * (1 + $tax / 100);
                                     }
 //
                                     $sqlNews[] = array(
@@ -352,7 +347,7 @@ class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage
                                         $writeConnection->insertMultiple($installer->getTableName('supplier/purchaseorder_product'), $sqlNews);
                                         $sqlNews = array();
                                     }
-                                    $totalProducts += $codeArr['qty_order'];
+                                    $totalProducts += $codeArr['qty'];
                                 }
                             }
                         }

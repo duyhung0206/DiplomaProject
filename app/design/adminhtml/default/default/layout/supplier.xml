@@ -51,7 +51,7 @@
                     <reload_param_name>purchaseorder_products</reload_param_name>
                 </action>
                 <action method="addColumnInputName">
-                    <input_name>qty_order</input_name>
+                    <input_name>qty</input_name>
                 </action>
             </block>
         </block>

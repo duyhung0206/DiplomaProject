@@ -57,6 +57,8 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Edit_Tab_Products ex
         } else {
             $currency = Mage::getModel('supplier/purchaseorder')->load($this->getRequest()->getParam('id'))->getCurrency();
         }
+//        Zend_Debug::dump($currency);
+//        die('1');
         return $currency;
     }
 
@@ -148,14 +150,14 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Edit_Tab_Products ex
                             'supplier_sku' => 'IFNULL(purchaseproduct.supplier_sku,supplierproduct.supplier_sku)',
                         )
                     );
+
             }
             $collection->getSelect()->group('e.entity_id');
+
         } else {
             $collection = Mage::getModel('supplier/purchaseorder_product')->getCollection()
                                 ->addFieldToFilter('purchase_order_id', $this->getRequest()->getParam('id'))
                                 ->setIsGroupCountSql(true);
-            Zend_Debug::dump($collection->getData());
-            die('11');
         }
         $this->setCollection($collection);
         return parent::_prepareCollection();
@@ -175,7 +177,7 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Edit_Tab_Products ex
                 'align' => 'center',
                 'index' => 'entity_id',
                 'use_index' => true,
-                'disabled_values' => $this->_getDisabledProducts()
+                //'disabled_values' => $this->_getDisabledProducts()
             ));
         }
         if ($this->_editable) {
@@ -302,17 +304,17 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Edit_Tab_Products ex
                 'header' => Mage::helper('supplier')->__('Total Qty Ordered'),
                 'name' => 'qty',
                 'type' => 'number',
+                'editable' => $editable,
+                'edit_only' => $editable,
                 'index' => 'qty',
                 'filter' => false
             ));
-        }
-
-        if (!$this->getRequest()->getParam('id')) {
-            $this->addColumn('qty_order', array(
-                'header' => Mage::helper('supplier')->__('Qty order'),
-                'name' => 'qty_order',
+        }else{
+            $this->addColumn('qty', array(
+                'header' => Mage::helper('supplier')->__('Qty order1'),
+                'name' => 'qty',
                 'type' => 'number',
-                'index' => 'qty_order',
+                'index' => 'qty',
                 'filter' => false,
                 'editable' => true,
                 'edit_only' => true,
@@ -320,13 +322,6 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Edit_Tab_Products ex
                 'sortable' => false,
                 'renderer' => 'supplier/adminhtml_purchaseorder_edit_tab_renderer_AvailableQty'
             ));
-        } else {
-//            $resource = Mage::getSingleton('core/resource');
-//            $readConnection = $resource->getConnection('core_read');
-//            $installer = Mage::getModel('core/resource');
-//            $sql = 'SELECT distinct(`warehouse_id`),warehouse_name,qty_order from ' . $installer->getTableName("erp_inventory_purchase_order_product_warehouse") . ' WHERE (purchase_order_id = ' . $this->getRequest()->getParam("id") . ')';
-//            $results = $readConnection->fetchAll($sql);
-
         }
 
         if ($this->getRequest()->getParam('id')) {
@@ -387,15 +382,20 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Edit_Tab_Products ex
         $productCollection = Mage::getResourceModel('supplier/purchaseorder_product_collection')
                 ->addFieldToFilter('purchase_order_id', $purchaseOrder->getId());
 
+//        Zend_Debug::dump($productCollection->getData());
+        foreach ($productCollection as $product) {
+            $products[$product->getProductId()] = array('qty' => $product->getQty());
+        }
+
         if ($purchaseOrderProductImports = Mage::getModel('admin/session')->getData('purchaseorder_product_import')) {
             $productModel = Mage::getModel('catalog/product');
             foreach ($purchaseOrderProductImports as $productImport) {
                 $productId = $productModel->getIdBySku($productImport['SKU']);
                 if ($productId) {
-                    if (isset($productImport['QTY_ORDER'])) {
-                        $products[$productId]['qty_order'] = $productImport['QTY_ORDER'];
+                    if (isset($productImport['QTY'])) {
+                        $products[$productId]['qty'] = $productImport['QTY'];
                     } else {
-                        $products[$productId]['qty_order'] = 0;
+                        $products[$productId]['qty'] = 0;
                     }
 
                     if (isset($productImport['COST'])) {
