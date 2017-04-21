@@ -1,0 +1,60 @@
+<?php
+$purchaseOrderId = $this->getRequest()->getParam('id');
+$supplierId = $this->getRequest()->getParam('supplier_id');
+$purchaseOrder = Mage::getModel('supplier/purchaseorder')->load($purchaseOrderId);
+if ($supplierId) {
+    $supplierInfo = Mage::helper('supplier/supplier')->getSupplierInfoBySupplierId($supplierId);
+}
+if (!$supplierId) {
+    $supplierInfo = Mage::helper('supplier/purchaseorder')->getSupplierInfoByPurchaseOrderId($purchaseOrderId);
+}
+?>
+<?php
+/* Michael 201602 */
+$message = '';
+if($purchaseOrder->getStatus() == Furniturestore_Supplier_Model_Purchaseorder::PENDING_STATUS
+    && Mage::getStoreConfig('supplier/purchasing/require_confirmation_from_supplier')){
+        $message = $this->__('This purchase order still is pending. You must click on Request Confirm button to process it.');
+}elseif($purchaseOrder->getStatus() == Furniturestore_Supplier_Model_Purchaseorder::PENDING_STATUS
+    && !Mage::getStoreConfig('supplier/purchasing/require_confirmation_from_supplier')){
+        $message = $this->__('This purchase order still is pending. You must click on Confirm Purchase Order button to process it.');
+}elseif($purchaseOrder->getStatus() == Furniturestore_Supplier_Model_Purchaseorder::WAITING_CONFIRM_STATUS){
+    $message = $this->__('This purchase order still is waiting confirm. You must click on Confirm Purchase Order button to process it.');
+}
+/* end Michael 201602 */
+if($message) {
+    $html = '<div id="peding_purchaseorder_notice">
+        <ul class="messages">
+            <li id="purchase_order_notice" class="notice-msg">
+                <ul>
+                    <li>
+                                            <span>' .
+                    //$this->__('This purchase order still is pending. You must click on Confirm Purchase Order button to process it.')
+                    $message
+                    . '</span>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>';
+    echo $html;
+}
+?>
+<div class="entry-edit">
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo $this->__('Delivery Information') ?></h4>
+    </div>
+    <div id="" class="fieldset">
+        <div style="float:left; width:48%;">
+            <label for="">
+                <?php echo $this->__('Purchase products from supplier:') ?>
+            </label><br />
+            <a href="<?php echo $this->getUrl('adminhtml/sup_index/edit', array('id' => $purchaseOrder->getSupplierId())) ?>">
+                <b><?php echo $purchaseOrder->getSupplierName() ?></b>
+            </a>
+            <?php echo $supplierInfo ?>
+        </div>
+     
+        <div class="clear"></div>
+    </div>
+</div> 

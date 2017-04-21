@@ -1,34 +1,6 @@
 <?php
 
-/**
- * Magestore
- * 
- * NOTICE OF LICENSE
- * 
- * This source file is subject to the Magestore.com license that is
- * available through the world-wide-web at this URL:
- * http://www.magestore.com/license-agreement.html
- * 
- * DISCLAIMER
- * 
- * Do not edit or add to this file if you wish to upgrade this extension to newer
- * version in the future.
- * 
- * @category    Magestore
- * @package     Magestore_Inventory
- * @copyright   Copyright (c) 2012 Magestore (http://www.magestore.com/)
- * @license     http://www.magestore.com/license-agreement.html
- */
-
-/**
- * Inventory Supplier Edit Form Content Tab Block
- * 
- * @category    Magestore
- * @package     Magestore_Inventory
- * @author      Magestore Developer
- */
-
-class Magestore_Inventorypurchasing_Block_Adminhtml_Purchaseorder_Edit_Tab_Delivery extends Mage_Adminhtml_Block_Widget_Grid {
+class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Edit_Tab_Delivery extends Mage_Adminhtml_Block_Widget_Grid {
 
     public function __construct() {
         parent::__construct();
@@ -43,22 +15,21 @@ class Magestore_Inventorypurchasing_Block_Adminhtml_Purchaseorder_Edit_Tab_Deliv
 
     protected function _prepareLayout() {
         if ($purchaseOrderId = $this->getRequest()->getParam('id')) {
-            $purchaseOrder = Mage::getModel('inventorypurchasing/purchaseorder')->load($purchaseOrderId);
-            $resource = Mage::getSingleton('core/resource');
-            $readConnection = $resource->getConnection('core_read');
-            
-            $sql = 'SELECT purchase_order_product_id from ' . $resource->getTableName("erp_inventory_purchase_order_product") . ' WHERE (purchase_order_id = ' . $this->getRequest()->getParam("id") . ') AND (qty_recieved < qty)';
-            $results = $readConnection->fetchAll($sql);
+            $purchaseOrder = Mage::getModel('supplier/purchaseorder')->load($purchaseOrderId);
+//            $resource = Mage::getSingleton('core/resource');
+//            $readConnection = $resource->getConnection('core_read');
+//
+//            $sql = 'SELECT purchase_order_product_id from ' . $resource->getTableName("erp_inventory_purchase_order_product") . ' WHERE (purchase_order_id = ' . $this->getRequest()->getParam("id") . ') AND (qty_recieved < qty)';
+//            $results = $readConnection->fetchAll($sql);
             $pStatus = $purchaseOrder->getStatus();
-            if ($pStatus != Magestore_Inventorypurchasing_Model_Purchaseorder::PENDING_STATUS
-                    && $results && (count($results) >= 1)){
+            if ($pStatus != Furniturestore_Supplier_Model_Purchaseorder::PENDING_STATUS){
                 if ($this->checkCreateAllDelivery()
-                    && ($pStatus == Magestore_Inventorypurchasing_Model_Purchaseorder::AWAITING_DELIVERY_STATUS
-                        || $pStatus == Magestore_Inventorypurchasing_Model_Purchaseorder::RECEIVING_STATUS)
+                    && ($pStatus == Furniturestore_Supplier_Model_Purchaseorder::AWAITING_DELIVERY_STATUS
+                        || $pStatus == Furniturestore_Supplier_Model_Purchaseorder::RECEIVING_STATUS)
                 ) {
                     $this->setChild('create_all_delivery_button', $this->getLayout()->createBlock('adminhtml/widget_button')
                         ->setData(array(
-                            'label' => Mage::helper('inventorypurchasing')->__('Create all deliveries'),
+                            'label' => Mage::helper('supplier')->__('Create all deliveries'),
                             'onclick' => 'setLocation(\'' . $this->getUrl('*/*/alldelivery', array('purchaseorder_id' => $this->getRequest()->getParam('id'), 'action' => 'alldelivery', '_current' => false)) . '\')',
                             'class' => 'add',
                             'style' => 'float:right'
@@ -66,12 +37,12 @@ class Magestore_Inventorypurchasing_Block_Adminhtml_Purchaseorder_Edit_Tab_Deliv
                     );
                 }
                 if ($this->checkCreateNewDelivery()
-                    && ($pStatus == Magestore_Inventorypurchasing_Model_Purchaseorder::AWAITING_DELIVERY_STATUS
-                        || $pStatus == Magestore_Inventorypurchasing_Model_Purchaseorder::RECEIVING_STATUS)
+                    && ($pStatus == Furniturestore_Supplier_Model_Purchaseorder::AWAITING_DELIVERY_STATUS
+                        || $pStatus == Furniturestore_Supplier_Model_Purchaseorder::RECEIVING_STATUS)
                 ) {
                     $this->setChild('create_delivery_button', $this->getLayout()->createBlock('adminhtml/widget_button')
                         ->setData(array(
-                            'label' => Mage::helper('inventorypurchasing')->__('Create a new delivery'),
+                            'label' => Mage::helper('supplier')->__('Create a new delivery'),
                             'onclick' => 'setLocation(\'' . $this->getUrl('*/*/newdelivery', array('purchaseorder_id' => $this->getRequest()->getParam('id'), 'warehouse_ids' => $purchaseOrder->getWarehouseId(), 'action' => 'newdelivery', '_current' => false)) . '\')',
                             'class' => 'add',
                             'style' => 'float:right'
@@ -102,7 +73,7 @@ class Magestore_Inventorypurchasing_Block_Adminhtml_Purchaseorder_Edit_Tab_Deliv
     protected function _prepareCollection() {
         $resource = Mage::getSingleton('core/resource');
         $purchaseOrderId = $this->getRequest()->getParam('id');
-        $collection = Mage::getModel('inventorypurchasing/purchaseorder_delivery')->getCollection()
+        $collection = Mage::getModel('supplier/delivery')->getCollection()
                 ->addFieldToFilter('purchase_order_id', $purchaseOrderId);
 
         $filter = $this->getParam($this->getVarNameFilter(), null);
@@ -117,7 +88,7 @@ class Magestore_Inventorypurchasing_Block_Adminhtml_Purchaseorder_Edit_Tab_Deliv
         }
         
     if (isset($condorder['from']) || isset($condorder['to'])) {
-            $condorder = Mage::helper('inventorypurchasing')->filterDates($condorder, array('from', 'to'));
+            $condorder = Mage::helper('supplier')->filterDates($condorder, array('from', 'to'));
             if(isset($condorder['from']))
                 $from = $condorder['from'];
             if(isset($condorder['to']))
@@ -141,7 +112,7 @@ class Magestore_Inventorypurchasing_Block_Adminhtml_Purchaseorder_Edit_Tab_Deliv
         $currencyCode = Mage::app()->getStore()->getBaseCurrency()->getCode();
 
         $this->addColumn('delivery_id', array(
-            'header' => Mage::helper('inventorypurchasing')->__('ID'),
+            'header' => Mage::helper('supplier')->__('ID'),
             'width' => '80px',
             'type' => 'text',
             'index' => 'delivery_id',
@@ -172,42 +143,21 @@ class Magestore_Inventorypurchasing_Block_Adminhtml_Purchaseorder_Edit_Tab_Deliv
         $this->addColumn('product_image', array(
             'header' => Mage::helper('catalog')->__('Image'),
             'width' => '90px',
-            'renderer' => 'inventoryplus/adminhtml_renderer_productimage',
+            'renderer' => 'supplier/adminhtml_renderer_productimage',
             'filter' => false,
         ));
 
-        if ($this->getRequest()->getParam('id')) {
-            $resource = Mage::getSingleton('core/resource');
-            $readConnection = $resource->getConnection('core_read');
-            
-            $sql = 'SELECT distinct(`warehouse_id`),warehouse_name from ' . $resource->getTableName("erp_inventory_purchase_order_product_warehouse") . ' WHERE (purchase_order_id = ' . $this->getRequest()->getParam("id") . ')';
-            $results = $readConnection->fetchAll($sql);
-            
-            foreach ($results as $result) {
-                $this->addColumn('warehouse_' . $result['warehouse_id'], array(
-                    'header' => 'Qty Received <br/> <i>(' . $result['warehouse_name'] .')</i>',
-                    'name' => 'warehouse_' . $result['warehouse_id'],
-                    'type' => 'number',
-                    'index' => 'warehouse_' . $result['warehouse_id'],
-                    'filter' => false,
-                    'editable' => true,
-                    'edit_only' => true,
-                    'align' => 'right',
-                    'sortable' => false,
-                    'renderer' => 'inventorypurchasing/adminhtml_purchaseorder_edit_tab_renderer_delivery_warehouse'
-                ));
-            }
-        }
+//
 
         $this->addColumn('qty_delivery', array(
-            'header' => Mage::helper('inventorypurchasing')->__('Total Qty Received'),
+            'header' => Mage::helper('supplier')->__('Total Qty Received'),
             'name' => 'qty_delivery',
             'type' => 'number',
             'index' => 'qty_delivery'
         ));
 
         $this->addColumn('created_by', array(
-            'header' => Mage::helper('inventorypurchasing')->__('Created by'),
+            'header' => Mage::helper('supplier')->__('Created by'),
             'name' => 'create_by',
             'index' => 'created_by'
         ));
@@ -234,7 +184,7 @@ class Magestore_Inventorypurchasing_Block_Adminhtml_Purchaseorder_Edit_Tab_Deliv
     public function getSelectedRelatedDeliveries() {
         $deliveries = array();
         $purchaseOrder = $this->getPurchaseOrder();
-        $deliveryCollection = Mage::getResourceModel('inventorypurchasing/purchaseorder_delivery_collection')
+        $deliveryCollection = Mage::getResourceModel('supplier/delivery_collection')
                 ->addFieldToFilter('purchase_order_id', $purchaseOrder->getId());
         foreach ($deliveryCollection as $delivery) {
             $deliveries[$delivery->getDeliveryId()] = array('qty' => $delivery->getQty());
@@ -242,13 +192,8 @@ class Magestore_Inventorypurchasing_Block_Adminhtml_Purchaseorder_Edit_Tab_Deliv
         return $deliveries;
     }
 
-    /**
-     * get Current Purchase Order
-     *
-     * @return Magestore_Inventory_Model_Purchaseorder
-     */
     public function getPurchaseOrder() {
-        return Mage::getModel('inventorypurchasing/purchaseorder')->load($this->getRequest()->getParam('id'));
+        return Mage::getModel('supplier/purchaseorder')->load($this->getRequest()->getParam('id'));
     }
 
     /**
@@ -264,61 +209,21 @@ class Magestore_Inventorypurchasing_Block_Adminhtml_Purchaseorder_Edit_Tab_Deliv
     public function getResetFilterButtonHtml() {
         $allButtonShow = $this->getChildHtml('create_delivery_button') . $this->getChildHtml('create_all_delivery_button') . parent::getResetFilterButtonHtml();
         Mage::dispatchEvent('add_more_button_delivery_position', array('allbuttonshow' => &$allButtonShow, 'grid' => $this));
-//        return $this->getChildHtml('create_delivery_button') . $this->getChildHtml('create_all_delivery_button') . parent::getResetFilterButtonHtml();
         return $allButtonShow;
     }
 
     public function checkCreateNewDelivery() {
-        $canDelivery = false;
+        $canDelivery = true;
         $adminId = Mage::getModel('admin/session')->getUser()->getId();
         if (!$adminId)
             return null;
-        $purchaseOrderId = $this->getRequest()->getParam('id');
-        $purchaseOrder = Mage::getModel('inventorypurchasing/purchaseorder')->load($purchaseOrderId);
-        $warehouseIds = $purchaseOrder->getWarehouseId();
-        $warehouseIds = explode(',', $warehouseIds);
-        $warehouseAssigneds = Mage::getModel('inventoryplus/warehouse_permission')->getCollection()
-                ->addFieldToFilter('admin_id', $adminId);
-        $warehouseAvailableIds = array();
-        foreach ($warehouseAssigneds as $warehouseAssigned) {
-            if ($warehouseAssigned->getData('can_purchase_product'))
-                $warehouseAvailableIds[] = $warehouseAssigned->getWarehouseId();
-        }        
-        //check if create all product
-        $purchaseOrderProducts = Mage::getModel('inventorypurchasing/purchaseorder_productwarehouse')
-                ->getCollection()              
-                ->addFieldToFilter('warehouse_id' , array('in' => $warehouseAvailableIds))
-                ->addFieldToFilter('purchase_order_id', $purchaseOrderId);
-        foreach($purchaseOrderProducts as $purchaseOrderProduct){            
-            $check = $purchaseOrderProduct->getQtyOrder() - $purchaseOrderProduct->getQtyReceived() - $purchaseOrderProduct->getQtyReturned();
-            if($check > 0){
-                $canDelivery = true;
-                break;
-            }
-        }
-        
+
         return $canDelivery;
     }
 
     public function checkCreateAllDelivery() {	
 		$canAllDelivery = true;
 		$purchaseOrderId = $this->getRequest()->getParam('id');
-		if ($purchaseOrderId) {
-			$resource = Mage::getSingleton('core/resource');
-			$readConnection = $resource->getConnection('core_read');
-			$installer = Mage::getModel('core/resource');
-			$sql = 'SELECT distinct(`warehouse_id`),warehouse_name,qty_order from ' . $installer->getTableName("erp_inventory_purchase_order_product_warehouse") . ' WHERE (purchase_order_id = ' .$purchaseOrderId . ')';
-			$results = $readConnection->fetchAll($sql);
-			if (count($results) > 0) {
-				foreach ($results as $result) {
-					if($result['warehouse_id']){
-						if(!Mage::helper('inventoryplus')->getPermission($result['warehouse_id'], 'can_purchase_product')){
-							$canAllDelivery = false;
-						}
-					}
-				}
-			}
-		}
 		return $canAllDelivery;
     }
 

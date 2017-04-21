@@ -156,8 +156,8 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Edit_Tab_Products ex
 
         } else {
             $collection = Mage::getModel('supplier/purchaseorder_product')->getCollection()
-                                ->addFieldToFilter('purchase_order_id', $this->getRequest()->getParam('id'))
-                                ->setIsGroupCountSql(true);
+                                ->addFieldToFilter('purchase_order_id', $this->getRequest()->getParam('id'));
+//                                ->setIsGroupCountSql(true);
         }
         $this->setCollection($collection);
         return parent::_prepareCollection();

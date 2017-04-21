@@ -32,7 +32,7 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Edit_Tab_Form extend
         }
         if ($this->getRequest()->getParam('id')) {
             $fieldset->addField('created_by', 'label', array(
-                'label' => Mage::helper('supplier')->__('Create by'),
+                'label' => Mage::helper('supplier')->__('Created by'),
             ));
             $purchaseOrder = Mage::getModel('supplier/purchaseorder')->load($this->getRequest()->getParam('id'));
         } else {

@@ -337,21 +337,27 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Edit extends Mage_Ad
             $message = '';
             $sendEmail = Mage::registry('purchaseorder_data')->getSendMail();
             $paidAll = Mage::registry('purchaseorder_data')->getPaidAll();
+            $status = Mage::registry('purchaseorder_data')->getStatus();
+            $arrayStatus = Mage::helper('supplier/purchaseorder')->getReturnOrderStatus();
+            $labelStatus = $arrayStatus[$status];
             if($paidAll == 1) {
-                $message .= '<a style="background: #008000;" href="" onclick="return false" title="' . Mage::helper('supplier')->__('The payment has been made completely') . '">' . Mage::helper('supplier')->__('PAID') . '</a>';
+                $message .= '<a style="background: #008000;color:#fff" href="" onclick="return false" title="' . Mage::helper('supplier')->__('The payment has been made completely') . '">' . Mage::helper('supplier')->__('PAID') . '</a>';
             }else {
                 $paid = Mage::registry('purchaseorder_data')->getPaid();
                 if ($paid > 0) {
-                    $message .= '<a style="background: #0000FF;" href="" onclick="return false" title="' . Mage::helper('supplier')->__('You have paid partially') . '">' . Mage::helper('supplier')->__('PARTIALLY PAID') . '</a>';
+                    $message .= '<a style="background: #0000FF;color:#fff;padding: 0px 5px;margin: 2px;" href="" onclick="return false" title="' . Mage::helper('supplier')->__('You have paid partially') . '">' . Mage::helper('supplier')->__('PARTIALLY PAID') . '</a>';
                 } else {
-                    $message .= '<a style="background: #FF0000;" href="" onclick="return false" title="' . Mage::helper('supplier')->__('The payment hasn\'t made yet') . '">' . Mage::helper('supplier')->__('NOT PAID') . '</a>';
+                    $message .= '<a style="background: #FF0000;color:#fff;padding: 0px 5px;margin: 2px;" href="" onclick="return false" title="' . Mage::helper('supplier')->__('The payment hasn\'t made yet') . '">' . Mage::helper('supplier')->__('NOT PAID') . '</a>';
                 }
             }
             if ($sendEmail) {
-                $message .= '<a style="background: #008000;" href="" onclick="return false" title="' . Mage::helper('supplier')->__('You have sent the email of this PO to Supplier') . '">' . Mage::helper('supplier')->__('SENT') . '</a>';
+                $message .= '<a style="background: #008000;color:#fff;padding: 0px 5px;margin: 2px;" href="" onclick="return false" title="' . Mage::helper('supplier')->__('You have sent the email of this PO to Supplier') . '">' . Mage::helper('supplier')->__('SENT') . '</a>';
             } else {
-                $message .= '<a style="background: #FF0000;" href="" onclick="return false" title="' . Mage::helper('supplier')->__('You haven\'t sent the email of this PO to Supplier') . '">' . Mage::helper('supplier')->__('NOT SENT') . '</a>';
+                $message .= '<a style="background: #FF0000;color:#fff;padding: 0px 5px;margin: 2px;" href="" onclick="return false" title="' . Mage::helper('supplier')->__('You haven\'t sent the email of this PO to Supplier') . '">' . Mage::helper('supplier')->__('NOT SENT') . '</a>';
             }
+
+            $message .= '<a style="background: #000;color:#fff;text-transform: uppercase;padding: 0px 5px;margin: 2px;" href="" onclick="return false" title="' . Mage::helper('supplier')->__('Status') . '">' . $labelStatus . '</a>';
+
             return Mage::helper('supplier')->__("Edit Order No. '%s'", $this->htmlEscape(Mage::registry('purchaseorder_data')->getId())
             ).$message;
         }

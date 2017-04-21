@@ -8,15 +8,15 @@ class Furniturestore_Supplier_Helper_Supplier extends Mage_Core_Helper_Abstract 
 //        }
 //    }
 //
-//    public function getAllSupplierName() {
-//        $suppliers = array();
-//        $model = Mage::getModel('inventorypurchasing/supplier');
-//        $collection = $model->getCollection();
-//        foreach ($collection as $supplier) {
-//            $suppliers[$supplier->getId()] = $supplier->getSupplierName();
-//        }
-//        return $suppliers;
-//    }
+    public function getAllSupplierName() {
+        $suppliers = array();
+        $model = Mage::getModel('supplier/supplier');
+        $collection = $model->getCollection();
+        foreach ($collection as $supplier) {
+            $suppliers[$supplier->getId()] = $supplier->getSupplierName();
+        }
+        return $suppliers;
+    }
 //
 //    /**
 //     * get all suppliers have product by product id
@@ -68,27 +68,27 @@ class Furniturestore_Supplier_Helper_Supplier extends Mage_Core_Helper_Abstract 
         $supplierField .= "<br/>" . $this->__('Email: ') . $data['supplier_email'];
         return $supplierField;
     }
-//
-//    public function getBillingAddressBySupplierId($supplierId) {
-//        $supplierCollection = Mage::getResourceModel('inventorypurchasing/supplier_collection')
-//                ->addFieldToFilter('supplier_id', $supplierId);
-//        $data = $supplierCollection->setPageSize(1)->setCurPage(1)->getFirstItem()->getData();
-//        $countryLists = Mage::getModel('directory/country')->getResourceCollection()->loadByStore()->toOptionArray(true);
-//        $countryList = array();
-//        foreach ($countryLists as $county) {
-//            $countryList[$county['value']] = $county['label'];
-//        }
-//        $supplierField = $data['supplier_name'];
-//        $supplierField .= "<br/>" . $data['street'];
-//        $supplierField .= "<br/>" . $data['city'];
-//        if (isset($data['state'])) {
-//            $supplierField .= ", " . $data['state'];
-//        }
-//        $supplierField .= ", " . $data['postcode'];
-//        $supplierField .= "<br/>" . $countryList[$data['country_id']];
-//        $supplierField .= "<br/>" . $this->__('T: ') . $data['telephone'];
-//        return $supplierField;
-//    }
+
+    public function getBillingAddressBySupplierId($supplierId) {
+        $supplierCollection = Mage::getResourceModel('supplier/supplier_collection')
+                ->addFieldToFilter('supplier_id', $supplierId);
+        $data = $supplierCollection->setPageSize(1)->setCurPage(1)->getFirstItem()->getData();
+        $countryLists = Mage::getModel('directory/country')->getResourceCollection()->loadByStore()->toOptionArray(true);
+        $countryList = array();
+        foreach ($countryLists as $county) {
+            $countryList[$county['value']] = $county['label'];
+        }
+        $supplierField = $data['supplier_name'];
+        $supplierField .= "<br/>" . $data['street'];
+        $supplierField .= "<br/>" . $data['city'];
+        if (isset($data['state'])) {
+            $supplierField .= ", " . $data['state'];
+        }
+        $supplierField .= ", " . $data['postcode'];
+        $supplierField .= "<br/>" . $countryList[$data['country_id']];
+        $supplierField .= "<br/>" . $this->__('T: ') . $data['telephone'];
+        return $supplierField;
+    }
 //
 //    public function getLast30DaysTime() {
 //        $start_day = date('Y-m-d 00:00:00');

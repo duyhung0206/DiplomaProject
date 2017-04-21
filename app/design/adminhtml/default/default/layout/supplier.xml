@@ -62,4 +62,88 @@
         </block>
     </adminhtml_sup_purchaseorder_productgrid>
 
+    <!-- email send to supplier -->
+    <furniturestore_email_sendtosupplier>
+        <block type="adminhtml/template" name="furniturestore_send_email_to_supplier" template="supplier/email/sendtosupplier.phtml" />
+    </furniturestore_email_sendtosupplier>
+
+
+    <!--Delivery-->
+    <adminhtml_sup_purchaseorder_delivery>
+        <block type="core/text_list" name="root">
+            <block type="supplier/adminhtml_purchaseorder" name="information" template="supplier/purchaseorder/delivery_information.phtml" />
+            <block type="supplier/adminhtml_purchaseorder_edit_tab_delivery" name="supplier.purchaseorder.edit.tab.delivery"/>
+        </block>
+    </adminhtml_sup_purchaseorder_delivery>
+    <adminhtml_sup_purchaseorder_deliverygrid>
+        <block type="core/text_list" name="root">
+            <block type="supplier/adminhtml_purchaseorder_edit_tab_delivery" name="supplier.purchaseorder.edit.tab.delivery"/>
+        </block>
+    </adminhtml_sup_purchaseorder_deliverygrid>
+
+    <!--Prepare delivery-->
+    <adminhtml_sup_purchaseorder_preparedelivery>
+        <block type="core/text_list" name="root">
+            <block type="supplier/adminhtml_purchaseorder" name="delivery_button" template="supplier/purchaseorder/delivery.phtml" />
+            <block type="supplier/adminhtml_purchaseorder" name="csv_form" template="supplier/purchaseorder/importproduct_newdelivery.phtml" />
+            <block type="supplier/adminhtml_purchaseorder_editdelivery_tab_delivery" name="supplier.purchaseorder.edit.tab.preparedelivery"/>
+            <block type="adminhtml/widget_grid_serializer" name="related_grid_serializer">
+                <action method="initSerializerBlock">
+                    <grid_block_name>supplier.purchaseorder.edit.tab.preparedelivery</grid_block_name>
+                    <data_callback>getSelectedProducts</data_callback>
+                    <hidden_input_name>delivery_products</hidden_input_name>
+                    <reload_param_name>isproducts</reload_param_name>
+                </action>
+                <action method="addColumnInputName">
+                    <input_name>qty_delivery</input_name>
+                </action>
+            </block>
+        </block>
+    </adminhtml_sup_purchaseorder_preparedelivery>
+    <adminhtml_sup_purchaseorder_preparedeliverygrid>
+        <block type="core/text_list" name="root">
+            <block type="supplier/adminhtml_purchaseorder_editdelivery_tab_delivery" name="supplier.purchaseorder.edit.tab.preparedelivery"/>
+        </block>
+    </adminhtml_sup_purchaseorder_preparedeliverygrid>
+
+
+    <!--Return order-->
+    <adminhtml_sup_purchaseorder_returnorder>
+        <update handle="adminhtml_inventoryplus_layout" />
+        <block type="core/text_list" name="root">
+            <block type="supplier/adminhtml_purchaseorder_edit_tab_returnorder" name="supplier.purchaseorder.edit.tab.returnorder"/>
+        </block>
+    </adminhtml_sup_purchaseorder_returnorder>
+
+    <adminhtml_sup_purchaseorder_returnordergrid>
+        <block type="core/text_list" name="root">
+            <block type="supplier/adminhtml_purchaseorder_edit_tab_returnorder" name="supplier.purchaseorder.edit.tab.returnorder"/>
+        </block>
+    </adminhtml_sup_purchaseorder_returnordergrid>
+
+    <!--Add new return order-->
+    <adminhtml_sup_purchaseorder_preparenewreturnorder>
+        <block type="core/text_list" name="root">
+            <block type="supplier/adminhtml_purchaseorder" name="returnorder_time_button" template="supplier/purchaseorder/return_order_selected_time.phtml" />
+            <block type="supplier/adminhtml_purchaseorder" name="return_order_csv_form" template="supplier/purchaseorder/importproduct_newreturnorder.phtml" />
+            <block type="supplier/adminhtml_purchaseorder_returnorder_tab_returnorder" name="supplier.purchaseorder.edit.tab.preparenewreturnorder"/>
+            <block type="adminhtml/widget_grid_serializer" name="related_grid_serializer">
+                <action method="initSerializerBlock">
+                    <grid_block_name>supplier.purchaseorder.edit.tab.preparenewreturnorder</grid_block_name>
+                    <data_callback>getSelectedProducts</data_callback>
+                    <hidden_input_name>returnorder_products</hidden_input_name>
+                    <reload_param_name>isproducts</reload_param_name>
+                </action>
+                <action method="addColumnInputName">
+                    <input_name>qty_returned</input_name>
+                </action>
+            </block>
+        </block>
+    </adminhtml_sup_purchaseorder_preparenewreturnorder>
+    <adminhtml_sup_purchaseorder_preparenewreturnordergrid>
+        <block type="core/text_list" name="root">
+            <block type="supplier/adminhtml_purchaseorder_returnorder_tab_returnorder" name="supplier.purchaseorder.edit.tab.preparenewreturnorder"/>
+        </block>
+    </adminhtml_sup_purchaseorder_preparenewreturnordergrid>
+
 </layout>

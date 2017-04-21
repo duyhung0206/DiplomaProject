@@ -65,34 +65,7 @@ $installer->run("
 		PRIMARY KEY(`delivery_id`),
 		FOREIGN KEY (`purchase_order_id`) REFERENCES {$this->getTable('furniturestore_purchase_order')}(`purchase_order_id`) ON DELETE CASCADE ON UPDATE CASCADE
 	)ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        
-	CREATE TABLE IF NOT EXISTS {$this->getTable('furniturestore_returned_order')} (
-		`returned_order_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-		`purchase_order_id` int(11) unsigned NOT NULL,
-		`total_products` decimal(10,0) unsigned NOT NULL default '0',
-		`total_amount` decimal(12,4) unsigned NOT NULL default '0.0000',
-		`returned_on` datetime,
-		`status` tinyint(1) NOT NULL default '1',
-		`paid` decimal(12,4) default '0',
-		`supplier_id` int(11) unsigned NOT NULL default '0',
-		PRIMARY KEY(`returned_order_id`),
-		INDEX(`purchase_order_id`),
-		FOREIGN KEY (`purchase_order_id`) REFERENCES {$this->getTable('furniturestore_purchase_order')}(`purchase_order_id`) ON DELETE CASCADE ON UPDATE CASCADE
-	)ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
-	
-	CREATE TABLE IF NOT EXISTS {$this->getTable('furniturestore_returned_order_product')} (
-		`returned_order_product_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-		`returned_order_id` int(11) unsigned NOT NULL,
-		`qty_return` decimal(10,0) unsigned NOT NULL default '0',
-		`product_id` int(11) unsigned NOT NULL,
-		`product_name` varchar(255) default '',
-		`product_sku` varchar(255) default '',
-		PRIMARY KEY(`returned_order_product_id`),
-		INDEX (`returned_order_id`),
-		FOREIGN KEY (`returned_order_id`) REFERENCES {$this->getTable('furniturestore_returned_order')}(`returned_order_id`) ON DELETE CASCADE ON UPDATE CASCADE
-	)ENGINE=InnoDB DEFAULT CHARSET=utf8; 
+      
 ");
     
 $installer->endSetup();

@@ -144,6 +144,7 @@ class Furniturestore_Supplier_Helper_Purchaseorder extends Mage_Core_Helper_Abst
             5 => Mage::helper('supplier')->__('Vender website')
         );
     }
+
 //
 //    public function getPurchaseOrderStatus() {
 //        return array(
@@ -248,11 +249,11 @@ class Furniturestore_Supplier_Helper_Purchaseorder extends Mage_Core_Helper_Abst
 //        return $supplierField;
 //    }
 //
-//    public function importDeliveryProduct($data) {
-//        if (count($data)) {
-//            Mage::getModel('admin/session')->setData('delivery_purchaseorder_product_import', $data);
-//        }
-//    }
+    public function importDeliveryProduct($data) {
+        if (count($data)) {
+            Mage::getModel('admin/session')->setData('delivery_purchaseorder_product_import', $data);
+        }
+    }
 //
 //    public function importReturnOrderProduct($data) {
 //        if (count($data)) {
@@ -315,12 +316,12 @@ class Furniturestore_Supplier_Helper_Purchaseorder extends Mage_Core_Helper_Abst
 //    /**
 //     * get payment status
 //     */
-//    public function getPaymentStatus() {
-//        return array(
-//            0 => Mage::helper('inventorypurchasing')->__('Not Paid'),
-//            2 => Mage::helper('inventorypurchasing')->__('Partial Paid'),
-//            1 => Mage::helper('inventorypurchasing')->__('Paid')
-//        );
-//    }
+    public function getPaymentStatus() {
+        return array(
+            0 => Mage::helper('supplier')->__('Not Paid'),
+            2 => Mage::helper('supplier')->__('Partial Paid'),
+            1 => Mage::helper('supplier')->__('Paid')
+        );
+    }
 
 }

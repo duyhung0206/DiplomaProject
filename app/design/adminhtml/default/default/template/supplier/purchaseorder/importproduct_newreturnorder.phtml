@@ -1,0 +1,50 @@
+<div class="entry-edit">
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo $this->__('Import Products to Create Return Order') ?></h4>
+    </div>
+    <div id="supplier_form" class="fieldset ">
+        <div style="float: left;">
+            <div>
+                <label for="fileToUpload">
+                    <?php echo $this->__('Please choose CSV file to import') ?>
+                </label><br />
+                <input type="file" name="fileToUpload[]" id="fileToUpload" onchange="fileSelected();" enctype="multipart/form-data"/>
+                <input name="form_key" type="hidden" value="<?php echo $this->getFormKey() ?>" id="form_key"/>
+                <button style="" onclick="uploadFile()" class="scalable task" type="button" id="Upload"><span><?php echo $this->__('Import') ?></span></button>
+            </div>
+            <div class="clear"></div>
+            <div id="fileName">
+            </div>
+            <div id="fileSize">
+            </div>
+            <div id="fileType">
+            </div>
+            <div id="progressNumber">
+            </div>
+        </div>
+        <div id="messages" style="float: left;padding-left: 20px;width:60%;">
+            <ul class="messages">
+                <li class="notice-msg">
+                    <ul>
+                        <li>
+                            <?php echo $this->__('You can import loads of products to : ')?><br />
+                            <?php $example = $this->__("SKU : SKU of product <br />") ?>
+                            <?php $example = $this->__("QTY : QTY of product <br />") ?>
+                            <?php echo $this->__('The structure of CSV file is as follows:') ?><br />
+                            <h1><b><?php echo $this->__("SKU")?></b>, <b><?php echo $this->__("QTY")?></b></h1>
+                            <div style="padding-left: 20px;" >
+                                <?php echo $example ?>
+                            </div>
+                        </li>
+                        <li>
+                            <div style="float:left;">                                    
+                                <b><?php echo $this->__('Example file') ?> (<a href="<?php echo Mage::getBaseUrl('media') . 'inventory/csv/import_product_to_return_order.csv'; ?>"><?php echo $this->__('Download') ?></a>)</b>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>

@@ -3,7 +3,7 @@
 <config>
     <modules>
         <Furniturestore_Supplier>
-            <version>0.1.3</version>
+            <version>0.1.4</version>
         </Furniturestore_Supplier>
     </modules>
     <frontend>
@@ -99,6 +99,9 @@
                     <delivery>
                         <table>furniturestore_delivery</table>
                     </delivery>
+                    <returnorder>
+                        <table>furniturestore_return</table>
+                    </returnorder>
                 </entities>
             </supplier_mysql4>
         </models>
@@ -132,5 +135,21 @@
                 <class>Furniturestore_Supplier_Helper</class>
             </supplier>
         </helpers>
+        <template>
+            <email>
+                <supplier_email_supplier_template translate="label" module="supplier">
+                    <label>Supplier Email</label>
+                    <file>supplier/email_supplier.html</file>
+                    <type>html</type>
+                </supplier_email_supplier_template>
+            </email>
+        </template>
     </global>
+    <default>
+        <supplier>
+            <email_supplier>
+                <template>supplier_email_supplier_template</template>
+            </email_supplier>
+        </supplier>
+    </default>
 </config>

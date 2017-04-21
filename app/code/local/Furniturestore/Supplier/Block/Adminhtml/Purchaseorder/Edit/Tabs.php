@@ -100,19 +100,19 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Edit_Tabs extends Ma
                 ));
             }
 
-            if ($purchaseorder->getStatus() == Furniturestore_Supplier_Model_Purchaseorder::COMPLETE_STATUS && $purchaseorder->getCompleteBefore()) {
-                $this->addTab('notreceive_section', array(
-                    'label' => Mage::helper('supplier')->__('Shortfall Items'),
-                    'title' => Mage::helper('supplier')->__('Shortfall Items'),
-                    'url' => $this->getUrl('*/*/productNotReceive', array(
-                        '_current' => true,
-                        'id' => $this->getRequest()->getParam('id'),
-                        'store' => $this->getRequest()->getParam('store')
-                    )),
-                    'class' => 'ajax',
-//                    'active' => $returnActive
-                ));
-            }
+//            if ($purchaseorder->getStatus() == Furniturestore_Supplier_Model_Purchaseorder::COMPLETE_STATUS && $purchaseorder->getCompleteBefore()) {
+//                $this->addTab('notreceive_section', array(
+//                    'label' => Mage::helper('supplier')->__('Shortfall Items'),
+//                    'title' => Mage::helper('supplier')->__('Shortfall Items'),
+//                    'url' => $this->getUrl('*/*/productNotReceive', array(
+//                        '_current' => true,
+//                        'id' => $this->getRequest()->getParam('id'),
+//                        'store' => $this->getRequest()->getParam('store')
+//                    )),
+//                    'class' => 'ajax',
+////                    'active' => $returnActive
+//                ));
+//            }
         }
         return parent::_beforeToHtml();
     }
