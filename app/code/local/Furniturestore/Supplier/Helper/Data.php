@@ -61,12 +61,6 @@ class Furniturestore_Supplier_Helper_Data extends Mage_Core_Helper_Abstract {
         return $array;
     }
 
-    /**
-     * Parses the string into variables
-     *
-     * @param string $str
-     * @param array $arr
-     */
     public function parseStr($str, array &$arr = null) {
         return parse_str($str, $arr);
     }

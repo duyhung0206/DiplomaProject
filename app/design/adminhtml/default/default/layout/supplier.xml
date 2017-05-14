@@ -146,4 +146,37 @@
         </block>
     </adminhtml_sup_purchaseorder_preparenewreturnordergrid>
 
+    <!--Trash index-->
+    <adminhtml_sup_purchaseorder_trash>
+        <reference name="content">
+            <block type="supplier/adminhtml_trash" name="supplier.trash" />
+        </reference>
+    </adminhtml_sup_purchaseorder_trash>
+
+    <!--Tab purchase order in edit supplier-->
+    <adminhtml_sup_index_purchaseorder>
+        <block type="core/text_list" name="root">
+            <block type="supplier/adminhtml_supplier_edit_tab_purchaseorder" name="supplier.supplier.edit.tab.purchaseorder"/>
+        </block>
+    </adminhtml_sup_index_purchaseorder>
+    <adminhtml_sup_index_purchaseordergrid>
+        <block type="core/text_list" name="root">
+            <block type="supplier/adminhtml_supplier_edit_tab_purchaseorder" name="supplier.supplier.edit.tab.purchaseorder"/>
+        </block>
+    </adminhtml_sup_index_purchaseordergrid>
+
+    <!--Tab return order in edit supplier-->
+    <adminhtml_sup_index_returnorder>
+        <block type="core/text_list" name="root">
+            <block type="supplier/adminhtml_supplier_edit_tab_returnorder" name="supplier.purchaseorder.edit.tab.returnorder"/>
+
+        </block>
+    </adminhtml_sup_index_returnorder>
+
+    <adminhtml_sup_index_returnordergrid>
+        <block type="core/text_list" name="root">
+            <block type="supplier/adminhtml_supplier_edit_tab_returnorder" name="supplier.purchaseorder.edit.tab.returnorder"/>
+        </block>
+    </adminhtml_sup_index_returnordergrid>
+
 </layout>

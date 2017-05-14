@@ -2,7 +2,7 @@
 <config>
     <menu>
         <supplier module="supplier" translate="title">
-            <title>Supplier Extension</title>
+            <title>Furnistore Supplier</title>
             <sort_order>60</sort_order>
             <children>
                 <list_supplier module="supplier" translate="title">

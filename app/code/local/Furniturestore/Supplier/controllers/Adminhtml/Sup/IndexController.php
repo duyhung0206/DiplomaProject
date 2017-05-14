@@ -322,6 +322,31 @@ class Furniturestore_Supplier_Adminhtml_Sup_IndexController extends Mage_Adminht
         $this->_redirect('*/*/');
     }
 
+    /*Tab purchase order in edit supplier*/
+    public function purchaseorderAction() {
+        $this->loadLayout();
+        $this->getLayout()->getBlock('supplier.supplier.edit.tab.purchaseorder');
+        $this->renderLayout();
+    }
 
+    /*Tab purchase order in edit supplier _ grid*/
+    public function purchaseorderGridAction() {
+        $this->loadLayout();
+        $this->getLayout()->getBlock('supplier.supplier.edit.tab.purchaseorder');
+        $this->renderLayout();
+    }
+
+    /*Tab return order in edit supplier*/
+    public function returnOrderAction() {
+        $this->loadLayout();
+        $this->getLayout()->getBlock('supplier.purchaseorder.edit.tab.returnorder');
+        $this->renderLayout();
+    }
+
+    public function returnOrderGridAction() {
+        $this->loadLayout();
+        $this->getLayout()->getBlock('supplier.purchaseorder.edit.tab.returnorder');
+        $this->renderLayout();
+    }
 
 }

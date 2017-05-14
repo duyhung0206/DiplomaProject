@@ -28,26 +28,26 @@ class Furniturestore_Supplier_Block_Adminhtml_Supplier_Edit_Tabs extends Mage_Ad
             'class' => 'ajax',
         ));
         if ($this->getRequest()->getParam('id')) {
-//            $this->addTab('purchaseorder_section', array(
-//                'label' => Mage::helper('supplier')->__('Purchase Orders'),
-//                'title' => Mage::helper('supplier')->__('Purchase Orders'),
-//                'url' => $this->getUrl('*/*/purchaseorder', array(
-//                    '_current' => true,
-//                    'id' => $this->getRequest()->getParam('id'),
-//                    'store' => $this->getRequest()->getParam('store')
-//                )),
-//                'class' => 'ajax',
-//            ));
-//            $this->addTab('returnorder_section', array(
-//                'label' => Mage::helper('supplier')->__('Return Orders'),
-//                'title' => Mage::helper('supplier')->__('Return Orders'),
-//                'url' => $this->getUrl('*/*/returnorder', array(
-//                    '_current' => true,
-//                    'id' => $this->getRequest()->getParam('id'),
-//                    'store' => $this->getRequest()->getParam('store')
-//                )),
-//                'class' => 'ajax',
-//            ));
+            $this->addTab('purchaseorder_section', array(
+                'label' => Mage::helper('supplier')->__('Purchase Orders'),
+                'title' => Mage::helper('supplier')->__('Purchase Orders'),
+                'url' => $this->getUrl('*/*/purchaseorder', array(
+                    '_current' => true,
+                    'id' => $this->getRequest()->getParam('id'),
+                    'store' => $this->getRequest()->getParam('store')
+                )),
+                'class' => 'ajax',
+            ));
+            $this->addTab('returnorder_section', array(
+                'label' => Mage::helper('supplier')->__('Return Orders'),
+                'title' => Mage::helper('supplier')->__('Return Orders'),
+                'url' => $this->getUrl('*/*/returnorder', array(
+                    '_current' => true,
+                    'id' => $this->getRequest()->getParam('id'),
+                    'store' => $this->getRequest()->getParam('store')
+                )),
+                'class' => 'ajax',
+            ));
         }
         return parent::_beforeToHtml();
     }

@@ -129,6 +129,12 @@
             <supplier>
                 <class>Furniturestore_Supplier_Block</class>
             </supplier>
+            <!--rewrite Mage_Adminhtml_Block_Report_Product_Lowstock_Grid-->
+            <adminhtml>
+                <rewrite>
+                    <report_product_lowstock_grid>Furniturestore_Supplier_Block_Adminhtml_Report_Product_Lowstock_Grid</report_product_lowstock_grid>
+                </rewrite>
+            </adminhtml>
         </blocks>
         <helpers>
             <supplier>

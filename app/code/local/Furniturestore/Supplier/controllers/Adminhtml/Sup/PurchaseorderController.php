@@ -206,6 +206,7 @@ class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage
 
             $model = Mage::getModel('supplier/purchaseorder')->load($this->getRequest()->getParam('id'));
             if ($this->getRequest()->getParam('id')) {
+                $data['send_mail'] = $model->getSendMail();
                 $data['created_by'] = $model->getData('created_by');
                 $data['status'] = $model->getData('status');
                 $data['shipping_tax'] = $model->getData('shipping_tax');
@@ -722,6 +723,15 @@ class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage
                                         ->setSametime($sametime)
                                         ->setCreatedBy($admin)
                                         ->save();
+
+                                    /*add product qty*/
+                                    $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($pId);
+                                    if ($stockItem->getId() > 0 and $stockItem->getManageStock()) {
+                                        $qty = $stockItem->getQty() + $codeArr['qty_delivery'];
+                                        $stockItem->setQty($qty);
+                                        $stockItem->setIsInStock((int)($qty > 0));
+                                        $stockItem->save();
+                                    }
                                     $totalProductDelivery += $codeArr['qty_delivery'];
                                 }
 
@@ -807,6 +817,7 @@ class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage
         $this->_redirect('*/*/');
     }
 
+    /*Import product create delivery*/
     public function importproductforcreatedeliveryAction() {
         $getParams = $this->getRequest()->getParams();
         Mage::getModel('admin/session')->setData('delivery_create_at', null);
@@ -852,6 +863,56 @@ class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage
         }
     }
 
+    public function importproductforreturnorderAction() {
+        $getParams = $this->getRequest()->getParams();
+        Mage::getModel('admin/session')->setData('returnorder_create_at', null);
+        Mage::getModel('admin/session')->setData('returnorder_reason', null);
+        if (isset($getParams['create_at'])) {
+            Mage::getModel('admin/session')->setData('returnorder_create_at', $getParams['create_at']);
+        }
+        if (isset($getParams['reason'])) {
+            Mage::getModel('admin/session')->setData('returnorder_reason', $getParams['reason']);
+        }
+
+        $checkField = array(
+            'SKU','QTY'
+        );
+        $purchaseOrderId = $getParams['purchaseorder_id'];
+        $purchaseOrder = Mage::getModel('supplier/purchaseorder')->load($purchaseOrderId);
+        if (isset($_FILES['fileToUpload']['name']) && $_FILES['fileToUpload']['name'] != '') {
+            try {
+                $fileName = $_FILES['fileToUpload']['tmp_name'];
+                $Object = new Varien_File_Csv();
+                $dataFile = $Object->getData($fileName);
+                $newReturnOrderProduct = array();
+                $newReturnOrderProducts = array();
+                $fields = array();
+                $count = 0;
+                $purchaseorderHelper = Mage::helper('supplier/purchaseorder');
+                if (count($dataFile))
+                    foreach ($dataFile as $col => $row) {
+                        if ($col == 0) {
+                            if (count($row))
+                                foreach ($row as $index => $cell)
+                                    $fields[$index] = (string) $cell;
+                        }elseif ($col > 0) {
+                            if (count($row))
+                                foreach ($row as $index => $cell) {
+                                    if (isset($fields[$index])) {
+                                        $newReturnOrderProduct[$fields[$index]] = $cell;
+                                    }
+                                }
+                            $newReturnOrderProducts[] = $newReturnOrderProduct;
+                        }
+                    }//end foreach
+                $purchaseorderHelper->importReturnOrderProduct($newReturnOrderProducts);
+            } catch (Exception $e) {
+                Mage::log($e->getMessage(), null, 'furniturestoresupplier.log');
+            }
+        }
+    }
+
+    /*Save create delivery all*/
     public function allDeliveryAction() {
         $purchaseOrderId = $this->getRequest()->getParam('purchaseorder_id');
         if (!$purchaseOrderId) {
@@ -890,6 +951,15 @@ class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage
                         ->setSametime($sametime)
                         ->setCreatedBy($admin)
                         ->save();
+
+                    /*add product qty*/
+                    $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($product->getProductId());
+                    if ($stockItem->getId() > 0 and $stockItem->getManageStock()) {
+                        $qty = $stockItem->getQty() + $qtyDeliveries;
+                        $stockItem->setQty($qty);
+                        $stockItem->setIsInStock((int)($qty > 0));
+                        $stockItem->save();
+                    }
                     $deliveryIds[] = $delivery->getId();
                     $totalProductDelivery += $qtyDeliveries;
                 }
@@ -948,6 +1018,7 @@ class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage
         }
     }
 
+    /*Mark paid purchaseorder*/
     public function markaspaidAction() {
         $purchaseOrderId = $this->getRequest()->getParam('id');
         $purchaseOrder = Mage::getModel('supplier/purchaseorder')->load($purchaseOrderId);
@@ -975,6 +1046,7 @@ class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage
         $this->renderLayout();
     }
 
+    /*Return order grid*/
     public function returnOrderGridAction() {
         $this->loadLayout();
         $this->getLayout()->getBlock('supplier.purchaseorder.edit.tab.returnorder');
@@ -1013,6 +1085,7 @@ class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage
         }
     }
 
+    /*Prepare new return order*/
     public function prepareNewReturnOrderAction() {
         $this->_title($this->__('Inventory'))
             ->_title($this->__('Add New Return Order'));
@@ -1029,6 +1102,7 @@ class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage
         }
     }
 
+    /*Prepare new return order grid*/
     public function prepareNewReturnOrderGridAction() {
         $this->loadLayout();
         $this->getLayout()->getBlock('supplier.purchaseorder.edit.tab.preparenewreturnorder')
@@ -1036,7 +1110,7 @@ class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage
         $this->renderLayout();
     }
 
-    /*Save return order */
+    /*Save return order*/
     public function saveReturnAction() {
         $purchaseOrderId = $this->getRequest()->getPost('purchaseorder_id');
 
@@ -1048,7 +1122,6 @@ class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage
         }
         try {
             if ($data = $this->getRequest()->getPost()) {
-//                die();
                 $purchaseOrder = Mage::getModel('supplier/purchaseorder')->load($purchaseOrderId);
                 if (isset($data['returnorder_products'])) {
                     $returnProducts = array();
@@ -1073,11 +1146,22 @@ class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage
                                     $codeArr['qty_returned'] = $totalmaxQtyReturn;
                                 if (!$codeArr['qty_returned'] || $codeArr['qty_returned'] <= 0)
                                     continue;
-                    /*save*/   
+                                /*add product qty*/
+                                $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($pId);
+                                if ($stockItem->getId() > 0 and $stockItem->getManageStock()) {
+                                    $currQty = $stockItem->getQty();
+                                    if($currQty < $codeArr['qty_returned']){
+                                        Mage::getSingleton('adminhtml/session')->addError(
+                                            Mage::helper('supplier')->__('Product #%s don\'t enought qty to return !', $pId)
+                                        );
+                                        continue;
+                                    }
+                                }
                                 $purchaseorderProductItem->setQtyReturned($purchaseorderProductItem->getQtyReturned() + $codeArr['qty_returned'])
                                     ->save();
                                 $admin = Mage::getModel('admin/session')->getUser()->getUsername();
                                 $return = Mage::getModel('supplier/returnorder');
+
                                 /*save return*/
                                 $return->setReturnDate($data['return_date'])
                                     ->setQtyReturned($codeArr['qty_returned'])
@@ -1089,14 +1173,21 @@ class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage
                                     ->setSametime($sametime)
                                     ->setCreatedBy($admin)
                                     ->save();
+
+                                /*sub product qty*/
+                                $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($pId);
+                                if ($stockItem->getId() > 0 and $stockItem->getManageStock() && ($stockItem->getQty()>=$codeArr['qty_returned'])) {
+                                    $qty = $stockItem->getQty() - $codeArr['qty_returned'];
+                                    $stockItem->setQty($qty);
+                                    $stockItem->setIsInStock((int)($qty > 0));
+                                    $stockItem->save();
+                                }
+
                                 $totalProductReturn += $codeArr['qty_returned'];
-                                Zend_Debug::dump($purchaseorderProductItem->getData());
-                                Zend_Debug::dump($return->getData());
                             }
 
                         }
                     }
-                    Zend_Debug::dump($totalProductReturn);
 
                     /*Qty return = 0 error*/
                     if ($totalProductReturn == 0) {
@@ -1135,26 +1226,14 @@ class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage
                 return;
             }
 
-            $totalProductOrder = 0;
-            $totalProductReceived = 0;
+            $totalProductReturn = 0;
             $purchaseOrderProducts = Mage::getModel('supplier/purchaseorder_product')->getCollection()
                 ->addFieldToFilter('purchase_order_id', $purchaseOrderId);
 
-            $purchaseOrder->setStatus(Furniturestore_Supplier_Model_Purchaseorder::COMPLETE_STATUS);
-
-
             foreach ($purchaseOrderProducts as $purchaseOrderProduct) {
-                if ($purchaseOrderProduct->getQtyRecieved() < $purchaseOrderProduct->getQty()) {
-                    //$purchaseOrder->setStatus(5);
-                    $purchaseOrder->setStatus(Furniturestore_Supplier_Model_Purchaseorder::RECEIVING_STATUS);
-                }
-                $totalProductOrder += $purchaseOrderProduct->getQty();
-                $totalProductReceived += $purchaseOrderProduct->getQtyRecieved();
+                $totalProductReturn += $purchaseOrderProduct->getQtyReturned();
             }
-            $process = round(($totalProductReceived / $totalProductOrder) * 100, 2);
-            $purchaseOrder->setDeliveryProcess($process)->save();
-            $totalProduct_Recieved = $purchaseOrder->getData('total_products_recieved') + $totalProductDelivery;
-            $purchaseOrder->setTotalProductsRecieved($totalProduct_Recieved);
+            $purchaseOrder->setTotalProductRefunded($totalProductReturn);
             $purchaseOrder->save();
 
             Mage::getSingleton('adminhtml/session')->addSuccess(
@@ -1163,7 +1242,6 @@ class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage
             Mage::getSingleton('adminhtml/session')->setFormData(false);
             $this->_redirect('adminhtml/sup_purchaseorder/edit', array('id' => $this->getRequest()->getParam('purchaseorder_id'), 'active' => 'delivery'));
             return;
-//            }
         } catch (Exception $e) {
             Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
             Mage::getSingleton('adminhtml/session')->setFormData($data);
@@ -1177,4 +1255,318 @@ class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage
         $this->_redirect('*/*/');
     }
 
+    /*Print return order*/
+    public function printreceiptforreturnedAction() {
+        $purchaseOrderId = $this->getRequest()->getParam('purchaseorder_id');
+        $purchaseOrderProducts = Mage::getModel('supplier/purchaseorder_product')->getCollection()
+            ->addFieldToFilter('purchase_order_id', $purchaseOrderId)
+            ->addFieldToFilter('qty_returned', array('gt' => 0));
+
+        $sqlNews = $purchaseOrderProducts->getData();
+        $img = Mage::getDesign()->getSkinUrl('images/logo_email.gif', array('_area' => 'frontend'));
+        $img = 'https://jvdeh29369.i.lithium.com/html/survey_icons/magento_Full_color_horizontal.jpg';
+        $contents = '<div><img style="height:60px" src="' . $img . '" /></div>';
+//        $contents = '<div><img src="' . $img . '" /></div>';
+        $contents .= $this->getLayout()->createBlock('supplier/adminhtml_purchaseorder')
+            ->setPurchaseorderid($purchaseOrderId)
+            ->setSqlnews($sqlNews)
+            ->setTemplate('supplier/purchaseorder/printreceiptforreturned.phtml')
+            ->toHtml();
+
+        include("lib/Mpdf/mpdf.php");
+        $mpdf = new mPDF('', 'A4');
+
+        $mpdf->WriteHTML($contents);
+
+        $fileName = 'returned-items-purchase-order-' . $purchaseOrderId . '-' . Mage::helper('core')->formatDate(Mage::getModel('core/date')->date(), 'short');
+
+        $mpdf->Output($fileName . '.pdf', 'I');
+        exit;
+    }
+
+    /*Save return all order*/
+    public function returnAllOrderAction() {
+        $purchaseOrderId = $this->getRequest()->getParam('purchaseorder_id');
+        if (!$purchaseOrderId) {
+            Mage::getSingleton('adminhtml/session')->addError(
+                Mage::helper('supplier')->__('Unable to find delivery to save!')
+            );
+            $this->_redirect('*/*/');
+        }
+        try {
+            $purchaseOrder = Mage::getModel('supplier/purchaseorder')->load($purchaseOrderId);
+            $purchaseOrderProducts = Mage::getResourceModel('supplier/purchaseorder_product_collection')
+                ->addFieldToFilter('purchase_order_id', $purchaseOrderId);
+            $totalProductReturn = 0;
+            if ($purchaseOrderProducts->getSize()) {
+                $deliveryIds = array();
+
+                foreach ($purchaseOrderProducts as $product) {
+                    $sametime = strtotime(now());
+                    $qtyReturns = 0;
+                    $maxQtyReturn = $product->getData('qty_recieved') - $product->getData('qty_returned');
+
+                    if ($qtyReturns < $maxQtyReturn)
+                        $qtyReturns = $maxQtyReturn;
+                    if (!$qtyReturns || $qtyReturns <= 0)
+                        continue;
+                    /*add product qty*/
+                    $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($product->getProductId());
+                    if ($stockItem->getId() > 0 and $stockItem->getManageStock()) {
+                        $currQty = $stockItem->getQty();
+                        if($currQty < $qtyReturns){
+                            Mage::getSingleton('adminhtml/session')->addError(
+                                Mage::helper('supplier')->__('Product #%s don\'t enought qty to return !', $product->getProductId())
+                            );
+                            continue;
+                        }
+                    }
+                    $product->setQtyReturned($product->getData('qty_returned') + $qtyReturns)
+                        ->save();
+                    $admin = Mage::getModel('admin/session')->getUser()->getUsername();
+                    $return = Mage::getModel('supplier/returnorder');
+                    $return->setDeliveryDate(now())
+                        ->setQtyDelivery($qtyReturns)
+                        ->setPurchaseOrderId($purchaseOrderId)
+                        ->setProductId($product->getProductId())
+                        ->setProductName($product->getProductName())
+                        ->setProductSku($product->getProductSku())
+                        ->setSametime($sametime)
+                        ->setCreatedBy($admin)
+                        ->save();
+
+                    /*sub product qty*/
+                    $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($product->getProductId());
+                    if ($stockItem->getId() > 0 and $stockItem->getManageStock() && ($stockItem->getQty()>=$qtyReturns)) {
+                        $qty = $stockItem->getQty() - $qtyReturns;
+                        $stockItem->setQty($qty);
+                        $stockItem->setIsInStock((int)($qty > 0));
+                        $stockItem->save();
+                    }
+                    $returnIds[] = $return->getId();
+                    $totalProductReturn += $qtyReturns;
+                }
+
+                if ($totalProductReturn == 0) {
+                    Mage::getSingleton('adminhtml/session')->addError(
+                        Mage::helper('supplier')->__('Please select product and enter qty delivery for product to create delivery')
+                    );
+
+                    $this->_redirect('adminhtml/sup_purchaseorder/edit',
+                        array(
+                            'id' => $purchaseOrderId,
+                            'active' => 'delivery'));
+                    return;
+                }
+
+                $totalProductReturn = 0;
+                $purchaseOrderProducts = Mage::getModel('supplier/purchaseorder_product')->getCollection()
+                    ->addFieldToFilter('purchase_order_id', $purchaseOrderId);
+
+                foreach ($purchaseOrderProducts as $purchaseOrderProduct) {
+                    $totalProductReturn += $purchaseOrderProduct->getQtyReturned();
+                }
+                $purchaseOrder->setTotalProductRefunded($totalProductReturn);
+                $purchaseOrder->save();
+                
+                Mage::getSingleton('adminhtml/session')->addSuccess(
+                    Mage::helper('supplier')->__('All deliveries have been saved. The purchase order has been completed.')
+                );
+                Mage::getSingleton('adminhtml/session')->setFormData(false);
+                $this->_redirect('adminhtml/sup_purchaseorder/edit', array('id' => $purchaseOrderId, 'active' => 'delivery'));
+                return;
+            }
+
+            Mage::getSingleton('adminhtml/session')->addError(
+                Mage::helper('supplier')->__('Unable to find return to save!')
+            );
+            $this->_redirect('adminhtml/sup_purchaseorder/edit', array('id' => $purchaseOrderId, 'active' => 'delivery'));
+        } catch (Exception $e) {
+            Mage::getSingleton('adminhtml/session')->addError(
+                Mage::helper('supplier')->__('Unable to find return to save!')
+            );
+            $this->_redirect('adminhtml/sup_purchaseorder/edit', array('id' => $purchaseOrderId, 'active' => 'delivery'));
+            return;
+        }
+    }
+
+    /*Complete purchase order*/
+    public function completepurchaseorderAction() {
+        $purchaseOrderId = $this->getRequest()->getParam('id');
+        $purchaseOrder = Mage::getModel('supplier/purchaseorder')->load($purchaseOrderId);
+        try {
+            $purchaseOrder->setCompleteBefore(1)
+                ->setStatus(Furniturestore_Supplier_Model_Purchaseorder::COMPLETE_STATUS)
+                ->save();
+            Mage::getSingleton('adminhtml/session')->addSuccess(
+                Mage::helper('supplier')->__('This purchase order is completed.')
+            );
+            $this->_redirect('*/*/edit', array('id' => $purchaseOrderId));
+        } catch (Exception $e) {
+            Mage::getSingleton('adminhtml/session')->addError(
+                Mage::helper('supplier')->__('There is error while complete purchase order.')
+            );
+            Mage::getSingleton('adminhtml/session')->addError(
+                $e->getMessage()
+            );
+            $this->_redirect('*/*/edit', array('id' => $purchaseOrderId));
+        }
+    }
+
+    /*Move to trash*/
+    public function movetotrashAction() {
+        $purchaseOrderId = $this->getRequest()->getParam('id');
+        $model = Mage::getModel('supplier/purchaseorder')->load($purchaseOrderId);
+        $status = $model->getStatus();
+        Mage::app()->cleanCache();
+        if ($status != 5) {
+            try {
+                $model->setTrash(Furniturestore_Supplier_Model_Purchaseorder::IS_TRASH)->save();
+                Mage::getSingleton('adminhtml/session')->addSuccess(
+                    Mage::helper('supplier')->__('Purchase order has been move to trash')
+                );
+            } catch (Exception $e) {
+                Mage::getSingleton('adminhtml/session')->addError(
+                    Mage::helper('supplier')->__('There is error when move purchase order to trash')
+                );
+                Mage::getSingleton('adminhtml/session')->addError(
+                    $e->getMessage()
+                );
+            }
+        } else {
+            Mage::getSingleton('adminhtml/session')->addError(
+                Mage::helper('supplier')->__('Can not move to trash with purchase order awaiting delivery !')
+            );
+        }
+        $this->_redirect('*/*/index');
+    }
+
+    /*Trash index*/
+    public function trashAction() {
+        $this->loadLayout();
+        $this->renderLayout();
+    }
+
+    /*Restore purchaseorder*/
+    public function recycleAction() {
+        $purchaseOrderId = $this->getRequest()->getParam('id');
+        $model = Mage::getModel('supplier/purchaseorder')->load($purchaseOrderId);
+        Mage::app()->cleanCache();
+        try {
+            $model->setTrash(Furniturestore_Supplier_Model_Purchaseorder::IS_NOT_TRASH)->save();
+            Mage::getSingleton('adminhtml/session')->addSuccess(
+                Mage::helper('supplier')->__('Purchase order has been restored')
+            );
+        } catch (Exception $e) {
+            Mage::getSingleton('adminhtml/session')->addError(
+                Mage::helper('supplier')->__('There is error when restore purchase order')
+            );
+            Mage::getSingleton('adminhtml/session')->addError(
+                $e->getMessage()
+            );
+        }
+        $this->_redirect('*/*/trash');
+    }
+
+    /*Mass restore purchaseorder*/
+    public function massRecycleAction() {
+        Mage::app()->cleanCache();
+        $purchaseOrderIds = $this->getRequest()->getParam('purchaseorder_ids');
+        $total_recycled = 0;
+        if (!is_array($purchaseOrderIds)) {
+            Mage::getSingleton('adminhtml/session')->addError(Mage::helper('supplier')->__('Please select purchase order(s)!'));
+        } else {
+            foreach ($purchaseOrderIds as $purchaseOrderId) {
+                $model = Mage::getModel('supplier/purchaseorder')->load($purchaseOrderId);
+                try {
+                    $model->setTrash(Furniturestore_Supplier_Model_Purchaseorder::IS_NOT_TRASH)->save();
+                    $total_recycled++;
+                } catch (Exception $e) {
+                    $this->_getSession()->addError($e->getMessage());
+                }
+            }
+        }
+        Mage::getSingleton('adminhtml/session')->addSuccess(
+            Mage::helper('supplier')->__('Total %d record(s) have been successfully restored', $total_recycled)
+        );
+        $this->_redirect('*/*/trash');
+    }
+
+    /*Mass status*/
+    public function massStatusAction() {
+        $purchaseOrderIds = $this->getRequest()->getParam('purchaseorder_ids');
+        $total_saved = 0;
+        if (!is_array($purchaseOrderIds)) {
+            Mage::getSingleton('adminhtml/session')->addError(Mage::helper('supplier')->__('Please select purchase order(s)!'));
+        } else {
+            $massStatus = $this->getRequest()->getParam('status');
+            foreach ($purchaseOrderIds as $purchaseOrderId) {
+                $po = Mage::getModel('supplier/purchaseorder')->load($purchaseOrderId);
+                $po_status = $po->getStatus();
+                $hasDelivery = Mage::helper('supplier/purchaseorder')->haveDelivery($purchaseOrderId);
+                if ($po_status == 6) { // PO was completed
+                    Mage::getSingleton('adminhtml/session')->addError(
+                        Mage::helper('supplier')->__('Purchase order #%d cannot be changed because it was completed.', $purchaseOrderId)
+                    );
+                    continue;
+                }
+                if ($hasDelivery && $massStatus == '7') {
+                    Mage::getSingleton('adminhtml/session')->addError(
+                        Mage::helper('supplier')->__('Purchase order #%d cannot be canceled because some items have been received through deliveries.', $purchaseOrderId)
+                    );
+                    continue;
+                }
+                $isPOCancelOutdate = Mage::helper('supplier/purchaseorder')->isPOCancelOutdate($po);
+                if (!$isPOCancelOutdate && $massStatus == '7') {
+                    Mage::getSingleton('adminhtml/session')->addError(
+                        Mage::helper('supplier')->__('Purchase order #%d cannot be cancelled because the cancellation date has passed.', $purchaseOrderId)
+                    );
+                    continue;
+                }
+                try {
+                    $po->setStatus($this->getRequest()->getParam('status'))
+                        ->setIsMassupdate(true)
+                        ->save();
+                    $total_saved++;
+                } catch (Exception $e) {
+                    $this->_getSession()->addError($e->getMessage());
+                }
+            }
+        }
+        Mage::getSingleton('adminhtml/session')->addSuccess(
+            Mage::helper('supplier')->__('Total %d record(s) were successfully updated', $total_saved)
+        );
+        $this->_redirect('*/*/index');
+    }
+
+    /*mass trash purchase order*/
+    public function massTrashAction() {
+        Mage::app()->cleanCache();
+        $purchaseOrderIds = $this->getRequest()->getParam('purchaseorder_ids');
+        $total_moved = 0;
+        if (!is_array($purchaseOrderIds)) {
+            Mage::getSingleton('adminhtml/session')->addError(Mage::helper('supplier')->__('Please select purchase order(s)!'));
+        } else {
+            foreach ($purchaseOrderIds as $purchaseOrderId) {
+                $model = Mage::getModel('supplier/purchaseorder')->load($purchaseOrderId);
+                $status = $model->getStatus();
+                if ($status == 5) {
+                    Mage::getSingleton('adminhtml/session')->addError(
+                        Mage::helper('supplier')->__('Purchase Order %d cannot be moved to trash because its status is Awaiting Delivery!', $purchaseOrderId)
+                    );
+                } else {
+                    try {
+                        $model->setTrash(Furniturestore_Supplier_Model_Purchaseorder::IS_TRASH)->save();
+                        $total_moved++;
+                    } catch (Exception $e) {
+                        $this->_getSession()->addError($e->getMessage());
+                    }
+                }
+            }
+        }
+        Mage::getSingleton('adminhtml/session')->addSuccess(
+            Mage::helper('supplier')->__('Total %d record(s) have been successfully move to trash', $total_moved)
+        );
+        $this->_redirect('*/*/index');
+    }
 }

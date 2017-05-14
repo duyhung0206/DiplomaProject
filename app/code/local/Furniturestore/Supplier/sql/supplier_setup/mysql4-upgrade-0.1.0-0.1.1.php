@@ -20,6 +20,7 @@ $installer->run("
 		`delivery_process` float default '0',
 		`status` tinyint(1) NOT NULL default '1',
 		`paid` decimal(12,4) default '0',
+		`trash` decimal(12,4) default '0',
 		`total_products_recieved` decimal(10,0) default '0',
 		`created_by` varchar(255) default '',
 		`order_placed` int(11),

@@ -208,8 +208,6 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Edit_Tab_Form extend
         } else {
             $currency = $this->getRequest()->getParam('currency');
         }
-//        Zend_Debug::dump($currency);
-//        die('aa');
         $fieldset->addField('shipping_cost', 'text', array(
             'label' => Mage::helper('supplier')->__('Shipping Cost'),
             'required' => true,
@@ -261,31 +259,31 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Edit_Tab_Form extend
             $grandTotalInc = $subtotal + $shippingCost + $tax;
 
         }
-        if($this->getRequest()->getParam('id')) {
-            if(!$purchaseOrder->getPaidAll()) {
-                $fieldset->addField('paid', 'note', array(
-                    'label' => Mage::helper('supplier')->__('Money Paid'),
-                    'text' => Mage::app()->getStore($storeId)->setCurrentCurrency(Mage::getModel('directory/currency')->load($currency))->formatPrice($data['paid']),
-                ));
-
-                $fieldset->addField('paid_more', 'text', array(
-                    'label' => Mage::helper('supplier')->__('Last paid payment'),
-                    'required' => false,
-                    'name' => 'paid_more',
-                    //            'after_element_html' => ' '.$store->getBaseCurrency()->getCode(),
-                    'after_element_html' => ' <br /><div id="paid_more_comment"></div>
-                                                <script type="text/javascript">
-                                                        var select_currency = $("currency").value;
-                                                        $("paid_more_comment").innerHTML = select_currency;
-                                                </script>',
-                ));
-            }else{
-                $fieldset->addField('paid', 'note', array(
-                    'label' => Mage::helper('supplier')->__('Money Paid'),
-                    'text' => Mage::getModel('directory/currency')->load($currency)->formatTxt($totalWithTaxCurrency + $shippingCost),
-                ));
-            }
-        }
+//        if($this->getRequest()->getParam('id')) {
+//            if(!$purchaseOrder->getPaidAll()) {
+//                $fieldset->addField('paid', 'note', array(
+//                    'label' => Mage::helper('supplier')->__('Money Paid'),
+//                    'text' => Mage::app()->getStore($storeId)->setCurrentCurrency(Mage::getModel('directory/currency')->load($currency))->formatPrice($data['paid']),
+//                ));
+//
+//                $fieldset->addField('paid_more', 'text', array(
+//                    'label' => Mage::helper('supplier')->__('Last paid payment'),
+//                    'required' => false,
+//                    'name' => 'paid_more',
+//                    //            'after_element_html' => ' '.$store->getBaseCurrency()->getCode(),
+//                    'after_element_html' => ' <br /><div id="paid_more_comment"></div>
+//                                                <script type="text/javascript">
+//                                                        var select_currency = $("currency").value;
+//                                                        $("paid_more_comment").innerHTML = select_currency;
+//                                                </script>',
+//                ));
+//            }else{
+//                $fieldset->addField('paid', 'note', array(
+//                    'label' => Mage::helper('supplier')->__('Money Paid'),
+//                    'text' => Mage::getModel('directory/currency')->load($currency)->formatTxt($totalWithTaxCurrency + $shippingCost),
+//                ));
+//            }
+//        }
         $fieldset->addField('delivery_process', 'label', array(
             'label' => Mage::helper('supplier')->__('Delivery Process'),
             'required' => false,

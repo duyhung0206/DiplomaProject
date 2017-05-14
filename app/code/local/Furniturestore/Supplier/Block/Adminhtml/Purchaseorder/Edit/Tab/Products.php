@@ -311,7 +311,7 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Edit_Tab_Products ex
             ));
         }else{
             $this->addColumn('qty', array(
-                'header' => Mage::helper('supplier')->__('Qty order1'),
+                'header' => Mage::helper('supplier')->__('Qty order'),
                 'name' => 'qty',
                 'type' => 'number',
                 'index' => 'qty',
@@ -417,6 +417,11 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Edit_Tab_Products ex
                         $products[$productId]['supplier_sku'] = $productImport['SUPPLIER_SKU'];
                     } else {
                         $products[$productId]['supplier_sku'] = 0;
+                    }
+                    if (isset($productImport['QTY_ORDER'])) {
+                        $products[$productId]['qty'] = $productImport['QTY_ORDER'];
+                    } else {
+                        $products[$productId]['qty'] = 0;
                     }
                 }
             }

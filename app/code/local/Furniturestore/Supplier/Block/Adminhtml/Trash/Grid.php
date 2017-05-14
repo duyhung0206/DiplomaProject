@@ -1,32 +1,23 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: duyhung
- * Date: 03/04/2017
- * Time: 10:29
- */
 
-class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Grid extends Mage_Adminhtml_Block_Widget_Grid
-{
-    public function __construct()
-    {
+class Furniturestore_Supplier_Block_Adminhtml_Trash_Grid extends Mage_Adminhtml_Block_Widget_Grid {
+
+    public function __construct() {
         parent::__construct();
-        $this->setId('purchaseorderGrid');
-        $this->setDefaultSort('purchaseorder_id');
-        $this->setDefaultDir('ASC');
-//        $this->setUseAjax(true);
+        $this->setId('trashGrid');
+        $this->setDefaultSort('purchase_order_id');
+        $this->setDefaultDir('DESC');
         $this->setSaveParametersInSession(true);
     }
 
-    protected function _prepareCollection()
-    {
+    protected function _prepareCollection() {
         $collection = Mage::getModel('supplier/purchaseorder')->getCollection();
 
-        $collection->addFieldToFilter(
-            'trash', array('eq' => Furniturestore_Supplier_Model_Purchaseorder::IS_NOT_TRASH,
+        $collection -> addFieldToFilter(
+            'trash',
+            array('eq' => Furniturestore_Supplier_Model_Purchaseorder::IS_TRASH,
             )
         );
-
         $filter = $this->getParam($this->getVarNameFilter(), null);
         $condorder = '';
         if ($filter) {
@@ -37,14 +28,13 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Grid extends Mage_Ad
                 }
             }
         }
-
         if ($condorder) {
             $condorder = Mage::helper('supplier')->filterDates($condorder, array('from', 'to'));
-            if (isset($condorder['from']) && ($from = $condorder['from'])) {
+            if (isset($condorder['from']) && ($from = $condorder['from']) ) {
                 $from = date('Y-m-d', strtotime($from));
                 $collection->addFieldToFilter('purchase_on', array('gteq' => $from));
             }
-            if (isset($condorder['to']) && ($to = $condorder['to'])) {
+            if (isset($condorder['to']) && ($to = $condorder['to']) ) {
                 $to = date('Y-m-d', strtotime($to));
                 $to .= ' 23:59:59';
                 $collection->addFieldToFilter('purchase_on', array('lteq' => $to));
@@ -52,31 +42,6 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Grid extends Mage_Ad
         }
         $this->setCollection($collection);
         return parent::_prepareCollection();
-    }
-
-    protected function _prepareMassaction() {
-        $this->setMassactionIdField('purchase_order_id');
-        $this->getMassactionBlock()->setFormFieldName('purchaseorder_ids');
-
-        $statuses = Mage::helper('supplier/purchaseorder')->getMassPOStatus();
-        $this->getMassactionBlock()->addItem('status', array(
-            'label' => Mage::helper('supplier')->__('Change status'),
-            'url' => $this->getUrl('*/*/massStatus', array('_current' => true)),
-            'additional' => array(
-                'visibility' => array(
-                    'name' => 'status',
-                    'type' => 'select',
-                    'class' => 'required-entry',
-                    'label' => Mage::helper('supplier')->__('Status'),
-                    'values' => $statuses
-                ))
-        ));
-
-        $this->getMassactionBlock()->addItem('trash', array(
-            'label' => Mage::helper('supplier')->__('Move To Trash'),
-            'url' => $this->getUrl('*/*/massTrash', array('_current' => true))
-        ));
-        return $this;
     }
 
     protected function _prepareColumns() {
@@ -94,6 +59,13 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Grid extends Mage_Ad
             'type' => 'date',
             'index' => 'purchase_on',
             'filter_condition_callback' => array($this, 'filterCreatedOn')
+        ));
+
+        $this->addColumn('created_by', array(
+            'header' => Mage::helper('supplier')->__('Created by'),
+            'width' => '80px',
+            'align' => 'left',
+            'index' => 'created_by'
         ));
 
         $this->addColumn('bill_name', array(
@@ -140,30 +112,30 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Grid extends Mage_Ad
             'filter_condition_callback' => array($this, 'filterTotalAmount')
         ));
 
-        $this->addColumn('paid_all', array(
-            'header' => Mage::helper('supplier')->__('Payment'),
-            'width' => '150px',
-            'type' => 'options',
-            'align' => 'right',
-            'index' => 'paid_all',
-            'options' => Mage::helper('supplier/purchaseorder')->getPaymentStatus()
-        ));
-
         $this->addColumn('status', array(
             'header' => Mage::helper('supplier')->__('Status'),
             'align' => 'left',
-            'width' => '250px',
+            'width' => '80px',
             'index' => 'status',
             'type' => 'options',
             'options' => Mage::helper('supplier/purchaseorder')->getReturnOrderStatus(),
-            'renderer' => 'supplier/adminhtml_purchaseorder_renderer_status',
         ));
-
-        $labelAction = __('Edit');
-        $labelTrash = __('Move to Trash');
+        $labelAction = __('Restore');
         $this->addColumn('action', array(
             'header' => Mage::helper('supplier')->__('Action'),
-            'renderer' => 'supplier/adminhtml_purchaseorder_renderer_action',
+            'width' => '100',
+            'type' => 'action',
+            'getter' => 'getId',
+            'actions' => array(
+                array(
+                    'caption' => $labelAction,
+                    'url' => array('base' => '*/*/recycle'),
+                    'field' => 'id'
+                )),
+            'filter' => false,
+            'sortable' => false,
+            'index' => 'stores',
+            'is_system' => true
         ));
 
         $this->addExportType('*/*/exportCsv', Mage::helper('supplier')->__('CSV'));
@@ -172,19 +144,28 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Grid extends Mage_Ad
         return parent::_prepareColumns();
     }
 
-    /**
-     * get url for each row in grid
-     *
-     * @return string
-     */
-    public function getRowUrl($row) {
-        return $this->getUrl('*/*/edit', array('id' => $row->getId()));
+    public function filterSupplierCallback($collection, $column) {
+        $value = $column->getFilter()->getValue();
+        if (!is_null(@$value)) {
+            $collection->getSelect()->where('supplier_id = ' . $value);
+        }
+        return $this;
+    }
+
+    protected function _prepareMassaction() {
+        $this->setMassactionIdField('purchase_order_id');
+        $this->getMassactionBlock()->setFormFieldName('purchaseorder_ids');
+
+        $this->getMassactionBlock()->addItem('recycle', array(
+            'label' => Mage::helper('supplier')->__('Restore'),
+            'url' => $this->getUrl('*/*/massRecycle', array('_current' => true))
+        ));
+        return $this;
     }
 
     public function filterCreatedOn($collection, $column) {
         return $this;
     }
-
     public function filterTotalAmount($collection, $column) {
         $filter = $column->getFilter()->getValue();
         if (isset($filter['from']) && $filter['from']) {
@@ -195,12 +176,10 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Grid extends Mage_Ad
         }
     }
 
-    public function filterSupplierCallback($collection, $column) {
-        $value = $column->getFilter()->getValue();
-        if (!is_null(@$value)) {
-            $collection->getSelect()->where('supplier_id = ' . $value);
+    public function getRowClass($item){
+        if($item->getData('status') == Furniturestore_Supplier_Model_Purchaseorder::PENDING_STATUS){
+            return 'pending-po';
         }
-        return $this;
     }
 
 }

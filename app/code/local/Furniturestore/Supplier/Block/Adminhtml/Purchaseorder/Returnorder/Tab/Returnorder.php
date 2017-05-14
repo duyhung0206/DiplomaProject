@@ -73,11 +73,6 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Returnorder_Tab_Retu
             'index' => 'name',
         ));
 
-//        $sets = Mage::getResourceModel('eav/entity_attribute_set_collection')
-//                ->setEntityTypeFilter(Mage::getModel('catalog/product')->getResource()->getTypeId())
-//                ->load()
-//                ->toOptionHash();
-
         $this->addColumn('product_sku', array(
             'header' => Mage::helper('catalog')->__('SKU'),
             'width' => '80px',
@@ -118,28 +113,6 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Returnorder_Tab_Retu
             'sortable' => false,
             'renderer' => 'supplier/adminhtml_purchaseorder_returnorder_renderer_qtyreturn'
         ));
-
-//        $resource = Mage::getSingleton('core/resource');
-//        $readConnection = $resource->getConnection('core_read');
-//        $installer = Mage::getModel('core/resource');
-//        $sql = 'SELECT distinct(`warehouse_id`),warehouse_name from ' . $installer->getTableName("erp_inventory_purchase_order_product_warehouse") . ' WHERE (purchase_order_id = ' . $this->getRequest()->getParam("purchaseorder_id") . ')';
-//        $results = $readConnection->fetchAll($sql);
-//        foreach ($results as $result) {
-//            if(Mage::helper('inventoryplus')->getPermission($result['warehouse_id'], 'can_purchase_product')){
-//                $this->addColumn('warehouse_' . $result['warehouse_id'], array(
-//                    'header' => 'Return Qty from ' . $result['warehouse_name'],
-//                    'name' => 'warehouse_' . $result['warehouse_id'],
-//                    'type' => 'number',
-//                    'index' => 'warehouse_' . $result['warehouse_id'],
-//                    'filter' => false,
-//                    'editable' => true,
-//                    'edit_only' => true,
-//                    'align' => 'right',
-//                    'sortable' => false,
-//                    'renderer' => 'inventorypurchasing/adminhtml_purchaseorder_returnorder_renderer_warehouse'
-//                ));
-//			}
-//        }
     }
 
     public function getGridUrl() {
@@ -178,13 +151,13 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Returnorder_Tab_Retu
                 }
             }
         }else{
-//            $purchaseOrderProduct = Mage::getModel('supplier/purchaseorder_product')->getCollection()
-//                ->addFieldToFilter('purchase_order_id', $purchaseOrder->getId());
-//            foreach ($purchaseOrderProduct as $product) {
-//                if($product->getData('qty_recieved') > $product->getData('qty_returned')){
-//                    $products[$product->getProductId()]['QTY'] = $product->getData('qty_recieved') - $product->getData('qty_returned');
-//                }
-//            }
+            $purchaseOrderProduct = Mage::getModel('supplier/purchaseorder_product')->getCollection()
+                ->addFieldToFilter('purchase_order_id', $purchaseOrder->getId());
+            foreach ($purchaseOrderProduct as $product) {
+                if($product->getData('qty_recieved') > $product->getData('qty_returned')){
+                    $products[$product->getProductId()]['QTY'] = $product->getData('qty_recieved') - $product->getData('qty_returned');
+                }
+            }
         }
         return $products;
     }

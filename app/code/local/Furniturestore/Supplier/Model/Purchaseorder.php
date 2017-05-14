@@ -18,6 +18,15 @@ class Furniturestore_Supplier_Model_Purchaseorder extends Mage_Core_Model_Abstra
     const WAITING_APPROVE_STATUS = 9; //waiting approval from Warehouse Manager
     const WAITING_CONFIRM_STATUS = 10; //waiting confirmation from Supplier
     const RECEIVING_STATUS = 11; //after created the first delivery
+
+    /*
+     * Deleted Purchase order status
+     */
+    const IS_TRASH= 1;
+    const IS_NOT_TRASH= 0;
+
+    const PAID = 1;
+    const PARTIALLY_PAID = 2;
     
     public function _construct(){
         parent::_construct();

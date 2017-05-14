@@ -73,26 +73,14 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Edit_Tab_Returnorder
         return parent::_prepareLayout();
     }
 
-    /**
-     * prepare collection for block to display
-     *
-     * @return Magestore_Inventory_Block_Adminhtml_Supplier_Grid
-     */
     protected function _prepareCollection() {
         $purchase_order_id = Mage::app()->getRequest()->getParam('id');
         $collection = Mage::getModel('supplier/returnorder')
                         ->getCollection()->addFieldToFilter('purchase_order_id', $purchase_order_id);
-//        Zend_Debug::dump($collection->getData());
-//        die();
         $this->setCollection($collection);
         return parent::_prepareCollection();
     }
 
-    /**
-     * prepare columns for this grid
-     *
-     * @return Magestore_Inventory_Block_Adminhtml_Supplier_Grid
-     */
     protected function _prepareColumns() {
         $this->addColumn('return_id', array(
             'header' => Mage::helper('supplier')->__('ID'),
@@ -146,17 +134,6 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Edit_Tab_Returnorder
         return parent::_prepareColumns();
     }
 
-    /**
-     * prepare mass action for this grid
-     *
-     * @return Magestore_Inventory_Block_Adminhtml_Supplier_Grid
-     */
-
-    /**
-     * get url for each row in grid
-     *
-     * @return string
-     */
     public function getRowUrl($row) {
         return null;
     }
@@ -167,13 +144,26 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Edit_Tab_Returnorder
 
     public function checkCreateReturnAll() {
         $canReturnAll = true;
-
+        if(!$this->checkCreateReturn())
+            $canReturnAll = false;
         return $canReturnAll;
     }
 
     public function checkCreateReturn() {
-        $canReturn = true;
-
+        $canReturn = false;
+        $purchaseOrderId = $this->getRequest()->getParam('id');
+        $purchaseOrder = Mage::getModel('supplier/purchaseorder')->load($purchaseOrderId);
+//        if($purchaseOrder->getStatus() == Furniturestore_Supplier_Model_Purchaseorder::COMPLETE_STATUS){
+//            return false;
+//        }
+        $purchaseOrderProducts = Mage::getModel('supplier/purchaseorder_product')->getCollection()
+            ->addFieldToFilter('purchase_order_id', $purchaseOrderId);
+        foreach ($purchaseOrderProducts as $purchaseOrderProduct){
+            $qty_recieved = $purchaseOrderProduct->getData('qty_recieved');
+            $qty_returned = $purchaseOrderProduct->getData('qty_returned');
+            if($qty_recieved > $qty_returned)
+                $canReturn = true;
+        }
         return $canReturn;
     }
 

@@ -16,11 +16,6 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Edit_Tab_Delivery ex
     protected function _prepareLayout() {
         if ($purchaseOrderId = $this->getRequest()->getParam('id')) {
             $purchaseOrder = Mage::getModel('supplier/purchaseorder')->load($purchaseOrderId);
-//            $resource = Mage::getSingleton('core/resource');
-//            $readConnection = $resource->getConnection('core_read');
-//
-//            $sql = 'SELECT purchase_order_product_id from ' . $resource->getTableName("erp_inventory_purchase_order_product") . ' WHERE (purchase_order_id = ' . $this->getRequest()->getParam("id") . ') AND (qty_recieved < qty)';
-//            $results = $readConnection->fetchAll($sql);
             $pStatus = $purchaseOrder->getStatus();
             if ($pStatus != Furniturestore_Supplier_Model_Purchaseorder::PENDING_STATUS){
                 if ($this->checkCreateAllDelivery()

@@ -15,37 +15,27 @@
             <show_in_website>1</show_in_website>
             <show_in_store>1</show_in_store>
             <groups>
-                <supplier_group translate="label" module="supplier">
-                    <label>General Configuration</label>
-                    <frontend_type>text</frontend_type>
-                    <sort_order>1</sort_order>
-                    <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
+                <!--<supplier_group translate="label" module="supplier">-->
+                    <!--<label>General Configuration</label>-->
+                    <!--<frontend_type>text</frontend_type>-->
+                    <!--<sort_order>1</sort_order>-->
+                    <!--<show_in_default>1</show_in_default>-->
+                    <!--<show_in_website>1</show_in_website>-->
+                    <!--<show_in_store>1</show_in_store>-->
 
-                    <fields>
-                        <enable_dropship translate="label">
-                            <label>Enable Dropship plugin</label>
-                            <comment></comment>
-                            <frontend_type>select</frontend_type>
-                            <sort_order>20</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                        </enable_dropship>
-                            <!--<inchoo_select translate="label">-->
-                                <!--<label>My Dropdown: </label>-->
-                                <!--<comment>Source model provider Magento's default Yes/No values</comment>-->
-                                <!--<frontend_type>select</frontend_type>-->
-                                <!--<sort_order>90</sort_order>-->
-                                <!--<show_in_default>1</show_in_default>-->
-                                <!--<show_in_website>1</show_in_website>-->
-                                <!--<show_in_store>1</show_in_store>-->
-                                <!--<source_model>adminhtml/system_config_source_yesno</source_model>-->
-                            <!--</inchoo_select>-->
-                    </fields>
-                </supplier_group>
+                    <!--<fields>-->
+                        <!--<enable_dropship translate="label">-->
+                            <!--<label>Qty low stock</label>-->
+                            <!--<comment></comment>-->
+                            <!--<frontend_type>text</frontend_type>-->
+                            <!--<sort_order>20</sort_order>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<show_in_store>1</show_in_store>-->
+                            <!--&lt;!&ndash;<source_model>adminhtml/system_config_source_yesno</source_model>&ndash;&gt;-->
+                        <!--</enable_dropship>-->
+                    <!--</fields>-->
+                <!--</supplier_group>-->
                 <purchasing translate="label">
                     <label>Purchase Order</label>
                     <frontend_type>text</frontend_type>
@@ -54,16 +44,16 @@
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
                     <fields>
-                        <update_cost_supplier>
-                            <label>Update Supplier Cost</label>
-                            <frontend_type>select</frontend_type>
-                            <sort_order>1</sort_order>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <comment>Automatic update supplier cost after complete Purchase Order</comment>
-                        </update_cost_supplier>
+                        <!--<update_cost_supplier>-->
+                            <!--<label>Update Supplier Cost</label>-->
+                            <!--<frontend_type>select</frontend_type>-->
+                            <!--<sort_order>1</sort_order>-->
+                            <!--<source_model>adminhtml/system_config_source_yesno</source_model>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<show_in_store>1</show_in_store>-->
+                            <!--<comment>Automatic update supplier cost after complete Purchase Order</comment>-->
+                        <!--</update_cost_supplier>-->
 
                         <status_management_purchaseorder_separator translate="label comment">
                             <label>Supplier Confirmation</label>
