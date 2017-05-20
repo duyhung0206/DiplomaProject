@@ -7,7 +7,51 @@
  */
 class Furniturestore_Supplier_Adminhtml_Sup_PurchaseorderController extends Mage_Adminhtml_Controller_Action{
 
+    protected function _isAllowed()
+    {
+        return Mage::getSingleton('admin/session')->isAllowed('admin/supplier/list_purchaseorder');
+    }
+
+    public function exportCsvAction() {
+        $fileName = 'purchase_order.csv';
+        $content = $this->getLayout()
+            ->createBlock('supplier/adminhtml_purchaseorder_grid')
+            ->getCsv();
+        $this->_prepareDownloadResponse($fileName, $content);
+    }
+
+    public function exportExcelAction()
+    {
+        $fileName   = 'purchase_order.xls';
+        $content    = $this->getLayout()->createBlock('supplier/adminhtml_purchaseorder_grid');
+        $this->_prepareDownloadResponse($fileName, $content->getExcelFile());
+    }
+
+    public function exportCsvTrashAction() {
+        $fileName = 'purchase_order_trash.csv';
+        $content = $this->getLayout()
+            ->createBlock('supplier/adminhtml_trash_grid')
+            ->getCsv();
+        $this->_prepareDownloadResponse($fileName, $content);
+    }
+
+    public function exportExcelTrashAction()
+    {
+        $fileName   = 'purchase_order_trash.xls';
+        $content    = $this->getLayout()->createBlock('supplier/adminhtml_trash_grid');
+        $this->_prepareDownloadResponse($fileName, $content->getExcelFile());
+    }
+
     public function indexAction() {
+//        $admin = Mage::getSingleton('admin/session')->getUser();
+//        $roleData = Mage::getModel('admin/user')->load($admin->getUserId())->getRole();
+//        $supplier = Mage::getModel('supplier/supplier')->getCollection()
+//            ->addFieldToFilter('user_id', $admin->getUserId())
+//            ->getFirstItem();
+//        if($roleData->getRoleName() == 'Role for supplier'){
+//            return $this->_redirect('adminhtml/sup_index/edit/', array('id' => $supplier->getId()));
+//        }
+
         $this->loadLayout()
             ->renderLayout();
     }

@@ -138,8 +138,8 @@ class Furniturestore_Supplier_Block_Adminhtml_Trash_Grid extends Mage_Adminhtml_
             'is_system' => true
         ));
 
-        $this->addExportType('*/*/exportCsv', Mage::helper('supplier')->__('CSV'));
-        $this->addExportType('*/*/exportXml', Mage::helper('supplier')->__('XML'));
+        $this->addExportType('*/*/exportCsvTrash', Mage::helper('supplier')->__('CSV'));
+        $this->addExportType('*/*/exportExcelTrash', Mage::helper('supplier')->__('Excel'));
 
         return parent::_prepareColumns();
     }

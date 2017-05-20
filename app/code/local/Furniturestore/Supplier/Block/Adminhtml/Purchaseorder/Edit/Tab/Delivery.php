@@ -17,34 +17,39 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Edit_Tab_Delivery ex
         if ($purchaseOrderId = $this->getRequest()->getParam('id')) {
             $purchaseOrder = Mage::getModel('supplier/purchaseorder')->load($purchaseOrderId);
             $pStatus = $purchaseOrder->getStatus();
-            if ($pStatus != Furniturestore_Supplier_Model_Purchaseorder::PENDING_STATUS){
-                if ($this->checkCreateAllDelivery()
-                    && ($pStatus == Furniturestore_Supplier_Model_Purchaseorder::AWAITING_DELIVERY_STATUS
-                        || $pStatus == Furniturestore_Supplier_Model_Purchaseorder::RECEIVING_STATUS)
-                ) {
-                    $this->setChild('create_all_delivery_button', $this->getLayout()->createBlock('adminhtml/widget_button')
-                        ->setData(array(
-                            'label' => Mage::helper('supplier')->__('Create all deliveries'),
-                            'onclick' => 'setLocation(\'' . $this->getUrl('*/*/alldelivery', array('purchaseorder_id' => $this->getRequest()->getParam('id'), 'action' => 'alldelivery', '_current' => false)) . '\')',
-                            'class' => 'add',
-                            'style' => 'float:right'
-                        ))
-                    );
-                }
-                if ($this->checkCreateNewDelivery()
-                    && ($pStatus == Furniturestore_Supplier_Model_Purchaseorder::AWAITING_DELIVERY_STATUS
-                        || $pStatus == Furniturestore_Supplier_Model_Purchaseorder::RECEIVING_STATUS)
-                ) {
-                    $this->setChild('create_delivery_button', $this->getLayout()->createBlock('adminhtml/widget_button')
-                        ->setData(array(
-                            'label' => Mage::helper('supplier')->__('Create a new delivery'),
-                            'onclick' => 'setLocation(\'' . $this->getUrl('*/*/newdelivery', array('purchaseorder_id' => $this->getRequest()->getParam('id'), 'warehouse_ids' => $purchaseOrder->getWarehouseId(), 'action' => 'newdelivery', '_current' => false)) . '\')',
-                            'class' => 'add',
-                            'style' => 'float:right'
-                        ))
-                    );
+            $admin = Mage::getSingleton('admin/session')->getUser();
+            $roleData = Mage::getModel('admin/user')->load($admin->getUserId())->getRole();
+            if($roleData->getRoleName() != 'Role for supplier'){
+                if ($pStatus != Furniturestore_Supplier_Model_Purchaseorder::PENDING_STATUS){
+                    if ($this->checkCreateAllDelivery()
+                        && ($pStatus == Furniturestore_Supplier_Model_Purchaseorder::AWAITING_DELIVERY_STATUS
+                            || $pStatus == Furniturestore_Supplier_Model_Purchaseorder::RECEIVING_STATUS)
+                    ) {
+                        $this->setChild('create_all_delivery_button', $this->getLayout()->createBlock('adminhtml/widget_button')
+                            ->setData(array(
+                                'label' => Mage::helper('supplier')->__('Create all deliveries'),
+                                'onclick' => 'setLocation(\'' . $this->getUrl('*/*/alldelivery', array('purchaseorder_id' => $this->getRequest()->getParam('id'), 'action' => 'alldelivery', '_current' => false)) . '\')',
+                                'class' => 'add',
+                                'style' => 'float:right'
+                            ))
+                        );
+                    }
+                    if ($this->checkCreateNewDelivery()
+                        && ($pStatus == Furniturestore_Supplier_Model_Purchaseorder::AWAITING_DELIVERY_STATUS
+                            || $pStatus == Furniturestore_Supplier_Model_Purchaseorder::RECEIVING_STATUS)
+                    ) {
+                        $this->setChild('create_delivery_button', $this->getLayout()->createBlock('adminhtml/widget_button')
+                            ->setData(array(
+                                'label' => Mage::helper('supplier')->__('Create a new delivery'),
+                                'onclick' => 'setLocation(\'' . $this->getUrl('*/*/newdelivery', array('purchaseorder_id' => $this->getRequest()->getParam('id'), 'warehouse_ids' => $purchaseOrder->getWarehouseId(), 'action' => 'newdelivery', '_current' => false)) . '\')',
+                                'class' => 'add',
+                                'style' => 'float:right'
+                            ))
+                        );
+                    }
                 }
             }
+
 
             Mage::dispatchEvent('add_more_button_delivery', array('grid' => $this));
         }

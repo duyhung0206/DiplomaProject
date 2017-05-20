@@ -10,7 +10,15 @@ class Furniturestore_Supplier_Block_Adminhtml_Supplier_Edit extends Mage_Adminht
         
         $this->_updateButton('save', 'label', Mage::helper('supplier')->__('Save'));
         $this->_updateButton('delete', 'label', Mage::helper('supplier')->__('Delete'));
-        
+
+
+        $admin = Mage::getSingleton('admin/session')->getUser();
+        $roleData = Mage::getModel('admin/user')->load($admin->getUserId())->getRole();
+
+        if($roleData->getRoleName() == 'Role for supplier'){
+            $this->_removeButton('delete');
+        }
+
         $this->_addButton('saveandcontinue', array(
             'label' => Mage::helper('adminhtml')->__('Save And Continue Edit'),
             'onclick' => 'saveAndContinueEdit()',

@@ -177,21 +177,6 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Returnorder_Tab_Retu
         return Mage::app()->getStore($storeId);
     }
 
-//    public function getWarehouseAvailable() {
-//        $adminId = Mage::getModel('admin/session')->getUser()->getId();
-//        if (!$adminId)
-//            return null;
-//        $warehouseAssigneds = Mage::getModel('inventoryplus/warehouse_permission')->getCollection()
-//                ->addFieldToFilter('admin_id', $adminId)
-//        ;
-//        $warehouseIds = array();
-//        foreach ($warehouseAssigneds as $warehouseAssigned) {
-//            if ($warehouseAssigned->getData('can_purchase_product'))
-//                $warehouseIds[] = $warehouseAssigned->getWarehouseId();
-//        }
-//        return $warehouseIds;
-//    }
-
     public function getRowUrl($row) {
         return false;
     }

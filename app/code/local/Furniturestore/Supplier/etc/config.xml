@@ -148,6 +148,11 @@
                     <file>supplier/email_supplier.html</file>
                     <type>html</type>
                 </supplier_email_supplier_template>
+                <supplier_password_remind_email_template translate="label" module="customer">
+                    <label>Remind Password Supplier</label>
+                    <file>supplier/password_new_supplier.html</file>
+                    <type>html</type>
+                </supplier_password_remind_email_template>
             </email>
         </template>
     </global>
@@ -156,6 +161,11 @@
             <email_supplier>
                 <template>supplier_email_supplier_template</template>
             </email_supplier>
+        </supplier>
+        <supplier>
+            <remind_password>
+                <template>supplier_password_remind_email_template</template>
+            </remind_password>
         </supplier>
     </default>
 </config>

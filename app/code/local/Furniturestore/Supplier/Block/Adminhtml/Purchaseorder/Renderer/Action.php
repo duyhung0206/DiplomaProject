@@ -25,14 +25,20 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Renderer_Action exte
                                     <span style='margin-right:10px;'>".Mage::helper('supplier')->__('Edit')."</span>
                                 </a>
                             </div>";
-            $content .=     "<div class='trash_disable' style='float:left;'>|</div>";
-            $content .=     "<div class='trash_disable' style='float:left;'>
+
+            $admin = Mage::getSingleton('admin/session')->getUser();
+            $roleData = Mage::getModel('admin/user')->load($admin->getUserId())->getRole();
+            if($roleData->getRoleName() != 'Role for supplier'){
+                $content .=     "<div class='trash_disable' style='float:left;'>|</div>";
+                $content .=     "<div class='trash_disable' style='float:left;'>
                             <a href=" .$url_move. ">
                                 <span style='margin-left:10px;'>".Mage::helper('supplier')->__('MoveToTrash')."</span>
                                 </a>
                             </div>
                             <br style='clear:both;'/>
                         </div>";
+            }
+
         }
         return $content;
     }

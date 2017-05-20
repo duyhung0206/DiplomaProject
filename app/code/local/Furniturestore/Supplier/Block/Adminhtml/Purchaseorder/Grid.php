@@ -50,32 +50,51 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Grid extends Mage_Ad
                 $collection->addFieldToFilter('purchase_on', array('lteq' => $to));
             }
         }
+
+        $admin = Mage::getSingleton('admin/session')->getUser();
+        $roleData = Mage::getModel('admin/user')->load($admin->getUserId())->getRole();
+        $supplier = Mage::getModel('supplier/supplier')->getCollection()
+            ->addFieldToFilter('user_id', $admin->getUserId())
+            ->getFirstItem();
+        if($roleData->getRoleName() == 'Role for supplier'){
+            $collection->addFieldToFilter('supplier_id', $supplier->getId());
+        }
+
+
         $this->setCollection($collection);
         return parent::_prepareCollection();
     }
 
     protected function _prepareMassaction() {
-        $this->setMassactionIdField('purchase_order_id');
-        $this->getMassactionBlock()->setFormFieldName('purchaseorder_ids');
+        $admin = Mage::getSingleton('admin/session')->getUser();
+        $roleData = Mage::getModel('admin/user')->load($admin->getUserId())->getRole();
+        $supplier = Mage::getModel('supplier/supplier')->getCollection()
+            ->addFieldToFilter('user_id', $admin->getUserId())
+            ->getFirstItem();
+        if($roleData->getRoleName() != 'Role for supplier'){
+            $this->setMassactionIdField('purchase_order_id');
+            $this->getMassactionBlock()->setFormFieldName('purchaseorder_ids');
 
-        $statuses = Mage::helper('supplier/purchaseorder')->getMassPOStatus();
-        $this->getMassactionBlock()->addItem('status', array(
-            'label' => Mage::helper('supplier')->__('Change status'),
-            'url' => $this->getUrl('*/*/massStatus', array('_current' => true)),
-            'additional' => array(
-                'visibility' => array(
-                    'name' => 'status',
-                    'type' => 'select',
-                    'class' => 'required-entry',
-                    'label' => Mage::helper('supplier')->__('Status'),
-                    'values' => $statuses
-                ))
-        ));
+            $statuses = Mage::helper('supplier/purchaseorder')->getMassPOStatus();
+            $this->getMassactionBlock()->addItem('status', array(
+                'label' => Mage::helper('supplier')->__('Change status'),
+                'url' => $this->getUrl('*/*/massStatus', array('_current' => true)),
+                'additional' => array(
+                    'visibility' => array(
+                        'name' => 'status',
+                        'type' => 'select',
+                        'class' => 'required-entry',
+                        'label' => Mage::helper('supplier')->__('Status'),
+                        'values' => $statuses
+                    ))
+            ));
 
-        $this->getMassactionBlock()->addItem('trash', array(
-            'label' => Mage::helper('supplier')->__('Move To Trash'),
-            'url' => $this->getUrl('*/*/massTrash', array('_current' => true))
-        ));
+            $this->getMassactionBlock()->addItem('trash', array(
+                'label' => Mage::helper('supplier')->__('Move To Trash'),
+                'url' => $this->getUrl('*/*/massTrash', array('_current' => true))
+            ));
+        }
+
         return $this;
     }
 
@@ -156,18 +175,20 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Grid extends Mage_Ad
             'index' => 'status',
             'type' => 'options',
             'options' => Mage::helper('supplier/purchaseorder')->getReturnOrderStatus(),
-            'renderer' => 'supplier/adminhtml_purchaseorder_renderer_status',
+//            'renderer' => 'supplier/adminhtml_purchaseorder_renderer_status',
         ));
 
-        $labelAction = __('Edit');
-        $labelTrash = __('Move to Trash');
-        $this->addColumn('action', array(
-            'header' => Mage::helper('supplier')->__('Action'),
-            'renderer' => 'supplier/adminhtml_purchaseorder_renderer_action',
-        ));
+//        $labelAction = __('Edit');
+//        $labelTrash = __('Move to Trash');
+        if(!$this->_isExport){
+            $this->addColumn('action', array(
+                'header' => Mage::helper('supplier')->__('Action'),
+                'renderer' => 'supplier/adminhtml_purchaseorder_renderer_action',
+            ));
+        }
 
         $this->addExportType('*/*/exportCsv', Mage::helper('supplier')->__('CSV'));
-        $this->addExportType('*/*/exportXml', Mage::helper('supplier')->__('XML'));
+        $this->addExportType('*/*/exportExcel', Mage::helper('supplier')->__('Excel'));
 
         return parent::_prepareColumns();
     }

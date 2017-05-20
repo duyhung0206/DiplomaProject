@@ -2,7 +2,7 @@
 <config>
     <menu>
         <supplier module="supplier" translate="title">
-            <title>Furnistore Supplier</title>
+            <title>Furniturestore Supplier</title>
             <sort_order>60</sort_order>
             <children>
                 <list_supplier module="supplier" translate="title">
@@ -30,15 +30,15 @@
             </all>
             <admin>
                 <children>
-                    <supplier translate="title" module="supplier">
+                    <supplier module="supplier" translate="title" >
                         <title>Supplier</title>
                         <sort_order>-100</sort_order>
                         <children>
-                            <list_supplier translate="title">
+                            <list_supplier module="supplier" translate="title">
                                 <title>Manage supplier</title>
                                 <sort_order>1</sort_order>
                             </list_supplier>
-                            <list_purchaseorder translate="title">
+                            <list_purchaseorder module="supplier" translate="title">
                                 <title>Manage purchase order</title>
                                 <sort_order>2</sort_order>
                             </list_purchaseorder>

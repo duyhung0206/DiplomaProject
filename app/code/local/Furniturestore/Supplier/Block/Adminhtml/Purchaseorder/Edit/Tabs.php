@@ -16,9 +16,9 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Edit_Tabs extends Ma
             return;
 
         $message = '';
-        if ($purchaseOrder->getStatus() == Furniturestore_Supplier_Model_Purchaseorder::PENDING_STATUS && Mage::getStoreConfig('inventoryplus/purchasing/require_confirmation_from_supplier')) {
+        if ($purchaseOrder->getStatus() == Furniturestore_Supplier_Model_Purchaseorder::PENDING_STATUS && Mage::getStoreConfig('supplier/purchasing/require_confirmation_from_supplier')) {
             $message = $this->__('This purchase order is pending. You must click on Request Confirmation button to move to next step.');
-        } elseif ($purchaseOrder->getStatus() == Furniturestore_Supplier_Model_Purchaseorder::PENDING_STATUS && !Mage::getStoreConfig('inventoryplus/purchasing/require_confirmation_from_supplier')) {
+        } elseif ($purchaseOrder->getStatus() == Furniturestore_Supplier_Model_Purchaseorder::PENDING_STATUS && !Mage::getStoreConfig('supplier/purchasing/require_confirmation_from_supplier')) {
             $message = $this->__('This purchase order is pending. You must click on Confirm Purchase Order button to move to next step.');
         } elseif ($purchaseOrder->getStatus() == Furniturestore_Supplier_Model_Purchaseorder::WAITING_CONFIRM_STATUS) {
             $message = $this->__('This purchase order is waiting for confirmation. You must click on Confirm Purchase Order button to move to next step.');

@@ -17,16 +17,24 @@ class Furniturestore_Supplier_Block_Adminhtml_Supplier_Edit_Tabs extends Mage_Ad
             'content' => $this->getLayout()->createBlock('supplier/adminhtml_supplier_edit_tab_form')->toHtml()
         ));
 
-        $this->addTab('products_section', array(
-            'label' => Mage::helper('supplier')->__('Products'),
-            'title' => Mage::helper('supplier')->__('Products'),
-            'url' => $this->getUrl('*/*/product', array(
-                '_current' => true,
-                'id' => $this->getRequest()->getParam('id'),
-                'store' => $this->getRequest()->getParam('store')
-            )),
-            'class' => 'ajax',
-        ));
+        $admin = Mage::getSingleton('admin/session')->getUser();
+        $roleData = Mage::getModel('admin/user')->load($admin->getUserId())->getRole();
+        $supplier = Mage::getModel('supplier/supplier')->getCollection()
+            ->addFieldToFilter('user_id', $admin->getUserId())
+            ->getFirstItem();
+        if($roleData->getRoleName() != 'Role for supplier'){
+            $this->addTab('products_section', array(
+                'label' => Mage::helper('supplier')->__('Products'),
+                'title' => Mage::helper('supplier')->__('Products'),
+                'url' => $this->getUrl('*/*/product', array(
+                    '_current' => true,
+                    'id' => $this->getRequest()->getParam('id'),
+                    'store' => $this->getRequest()->getParam('store')
+                )),
+                'class' => 'ajax',
+            ));
+        }
+
         if ($this->getRequest()->getParam('id')) {
             $this->addTab('purchaseorder_section', array(
                 'label' => Mage::helper('supplier')->__('Purchase Orders'),

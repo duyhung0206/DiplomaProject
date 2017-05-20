@@ -2,10 +2,22 @@
 
 class Furniturestore_Supplier_Adminhtml_Sup_IndexController extends Mage_Adminhtml_Controller_Action {
 
+    protected function _isAllowed()
+    {
+        return Mage::getSingleton('admin/session')->isAllowed('admin/supplier/list_supplier');
+    }
     /**
      * index action
      */
     public function indexAction() {
+        $admin = Mage::getSingleton('admin/session')->getUser();
+        $roleData = Mage::getModel('admin/user')->load($admin->getUserId())->getRole();
+        $supplier = Mage::getModel('supplier/supplier')->getCollection()
+            ->addFieldToFilter('user_id', $admin->getUserId())
+            ->getFirstItem();
+        if($roleData->getRoleName() == 'Role for supplier'){
+            return $this->_redirect('adminhtml/sup_index/edit/', array('id' => $supplier->getId()));
+        }
         $this->loadLayout()
             ->renderLayout();
     }
@@ -118,26 +130,70 @@ class Furniturestore_Supplier_Adminhtml_Sup_IndexController extends Mage_Adminht
 
         if ($data = $this->getRequest()->getPost()) {
             $model = Mage::getModel('supplier/supplier');
-
             $model->setData($data)
                 ->setId($this->getRequest()->getParam('id'));
-            if (Mage::getStoreConfig('supplier/supplier_group/enable_dropship')) {
-                if(isset($data['auto_general_password'])){
-                    $data['new_password'] = Mage::helper('supplier')->generatePassword();
-                }
-                if ($data['new_password']) {
-                    $newPassword = $data['new_password'];
-                    $newPasswordHash = md5($newPassword);
-                    $model->setPasswordHash($newPasswordHash);
-                }
-            }
             try {
                 $admin = Mage::getModel('admin/session')->getUser()->getUsername();
                 if (!$this->getRequest()->getParam('id')) {
                     $model->setData('created_by', $admin);
+                    try {
+                        $newPassword = Mage::helper('supplier')->generatePassword();
+                        $user = Mage::getModel('admin/user')
+                            ->setData(array(
+                                'username'  => $data['user_admin'],
+                                'firstname' => '[Supplier] ',
+                                'lastname'  => $data['supplier_name'],
+                                'email'     => $data['supplier_email'],
+                                'is_active' => 1
+                            ))->save();
+                        $model->setUserId($user->getId());
+                        $user->setNewPassword($newPassword)->setPasswordConfirmation($newPassword)->save();
+                    } catch (Exception $e) {
+                        Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                        $this->_redirect('*/*/new');
+                        return;
+                    }
+
+                }else{
+                    $data['send_mail'] = 1;
+                    $user_id = Mage::getModel('supplier/supplier')
+                        ->load($this->getRequest()->getParam('id'))
+                        ->getUserId();
+
+                    $user = Mage::getModel('admin/user')->load($user_id);
+
+                    $user->setUsername($data['user_admin'])
+                        ->setEmail($data['supplier_email'])
+                        ->setLastname($data['supplier_name'])
+                        ->setFirstname('[Supplier]')
+                        ->save();
+                }
+
+
+
+                /*Add rold for user admin supplier*/
+                $role = Mage::getModel('admin/roles')->getCollection()
+                    ->addFieldToFilter('role_name', 'Role for supplier')
+                    ->getFirstItem();
+
+                $user->setRoleIds(array($role->getId()))
+                    ->setRoleUserId($user->getUserId())
+                    ->saveRelations();
+
+                /*Reset password for user admin supplier*/
+                if(isset($data['auto_general_password'])){
+                    $data['new_password'] = Mage::helper('supplier/supplier')->generatePassword();
+                }
+                if ($data['new_password']) {
+                    $newPassword = $data['new_password'];
+                    $user->setNewPassword($newPassword)->setPasswordConfirmation($newPassword)->save();
+
                 }
                 $model->save();
+                if(isset($data['send_mail']) && isset($newPassword)){
 
+                    $this->sendEmailNewPass($model->getId(), $newPassword);
+                }
                 $resource = Mage::getSingleton('core/resource');
 
                 $writeConnection = $resource->getConnection('core_write');
@@ -307,9 +363,10 @@ class Furniturestore_Supplier_Adminhtml_Sup_IndexController extends Mage_Adminht
     public function deleteAction() {
         if ($this->getRequest()->getParam('id') > 0) {
             try {
-                $model = Mage::getModel('supplier/supplier');
-                $model->setId($this->getRequest()->getParam('id'))
-                    ->delete();
+                $model = Mage::getModel('supplier/supplier')->load($this->getRequest()->getParam('id'));
+                Mage::getModel('admin/user')->load($model->getData('user_id'))->delete();
+                $model->delete();
+
                 Mage::getSingleton('adminhtml/session')->addSuccess(
                     Mage::helper('adminhtml')->__('Supplier was successfully deleted')
                 );
@@ -347,6 +404,39 @@ class Furniturestore_Supplier_Adminhtml_Sup_IndexController extends Mage_Adminht
         $this->loadLayout();
         $this->getLayout()->getBlock('supplier.purchaseorder.edit.tab.returnorder');
         $this->renderLayout();
+    }
+
+    public function sendEmailNewPass($supplierId, $newpass){
+        $translate = Mage::getSingleton('core/translate');
+        $translate->setTranslateInline(false);
+        $storeId = Mage::app()->getStore()->getId();
+
+        $templateId = Mage::getStoreConfig('supplier/remind_password/template', $storeId);
+        $supplier = Mage::getModel('supplier/supplier')->load($supplierId);
+
+        $user = Mage::getSingleton('admin/session');
+        $userEmail = $user->getUser()->getEmail();
+        $userUsername = $user->getUser()->getUsername();
+
+        $emailTemplateVariables = array(
+            'name' => $supplier->getSupplierName(),
+            'password' => $newpass,
+            'account' => $supplier->getData('user_admin')
+        );
+
+        $sender  = array(
+            'name' => $userUsername,
+            'email' => $userEmail
+        );
+        $transaction = Mage::getSingleton('core/email_template');
+        $transaction->sendTransactional(
+            $templateId, //Template config
+            $sender, $supplier->getData('supplier_email'), $supplier->getData('contact_name'), $emailTemplateVariables
+        );
+        if (!$transaction->getSentSuccess()) {
+            throw new Exception();
+        }
+        $translate->setTranslateInline(true);
     }
 
 }

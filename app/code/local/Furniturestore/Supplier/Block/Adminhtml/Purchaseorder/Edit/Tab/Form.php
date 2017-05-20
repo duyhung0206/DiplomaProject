@@ -197,11 +197,11 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Edit_Tab_Form extend
             ));
         }
 
-        $fieldset->addField('tax_rate', 'text', array(
-            'label' => Mage::helper('supplier')->__('Tax Rate'),
-            'required' => true,
-            'name' => 'tax_rate',
-        ));
+//        $fieldset->addField('tax_rate', 'text', array(
+//            'label' => Mage::helper('supplier')->__('Tax Rate'),
+//            'required' => true,
+//            'name' => 'tax_rate',
+//        ));
 
         if ($this->getRequest()->getParam('id')) {
             $currency = $purchaseOrder->getCurrency();
@@ -259,31 +259,6 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Edit_Tab_Form extend
             $grandTotalInc = $subtotal + $shippingCost + $tax;
 
         }
-//        if($this->getRequest()->getParam('id')) {
-//            if(!$purchaseOrder->getPaidAll()) {
-//                $fieldset->addField('paid', 'note', array(
-//                    'label' => Mage::helper('supplier')->__('Money Paid'),
-//                    'text' => Mage::app()->getStore($storeId)->setCurrentCurrency(Mage::getModel('directory/currency')->load($currency))->formatPrice($data['paid']),
-//                ));
-//
-//                $fieldset->addField('paid_more', 'text', array(
-//                    'label' => Mage::helper('supplier')->__('Last paid payment'),
-//                    'required' => false,
-//                    'name' => 'paid_more',
-//                    //            'after_element_html' => ' '.$store->getBaseCurrency()->getCode(),
-//                    'after_element_html' => ' <br /><div id="paid_more_comment"></div>
-//                                                <script type="text/javascript">
-//                                                        var select_currency = $("currency").value;
-//                                                        $("paid_more_comment").innerHTML = select_currency;
-//                                                </script>',
-//                ));
-//            }else{
-//                $fieldset->addField('paid', 'note', array(
-//                    'label' => Mage::helper('supplier')->__('Money Paid'),
-//                    'text' => Mage::getModel('directory/currency')->load($currency)->formatTxt($totalWithTaxCurrency + $shippingCost),
-//                ));
-//            }
-//        }
         $fieldset->addField('delivery_process', 'label', array(
             'label' => Mage::helper('supplier')->__('Delivery Process'),
             'required' => false,

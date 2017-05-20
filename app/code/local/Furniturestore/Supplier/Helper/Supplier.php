@@ -6,8 +6,18 @@ class Furniturestore_Supplier_Helper_Supplier extends Mage_Core_Helper_Abstract 
 //        if (count($data)) {
 //            Mage::getModel('admin/session')->setData('supplier_product_import', $data);
 //        }
+//
 //    }
 //
+    public function generatePassword($length = 8)
+    {
+        $chars = Mage_Core_Helper_Data::CHARS_PASSWORD_LOWERS
+            . Mage_Core_Helper_Data::CHARS_PASSWORD_UPPERS
+            . Mage_Core_Helper_Data::CHARS_PASSWORD_DIGITS
+            . Mage_Core_Helper_Data::CHARS_PASSWORD_SPECIALS;
+        return Mage::helper('core')->getRandomString($length, $chars);
+    }
+
     public function getAllSupplierName() {
         $suppliers = array();
         $model = Mage::getModel('supplier/supplier');
@@ -17,20 +27,6 @@ class Furniturestore_Supplier_Helper_Supplier extends Mage_Core_Helper_Abstract 
         }
         return $suppliers;
     }
-//
-//    /**
-//     * get all suppliers have product by product id
-//     */
-//    public function getSupplierByProductId($productId) {
-//        $supplierProducts = Mage::getModel('inventorypurchasing/supplier_product')
-//                ->getCollection()
-//                ->addFieldToFilter('product_id', $productId);
-//        if (count($supplierProducts)) {
-//            return $supplierProducts;
-//        } else {
-//            return null;
-//        }
-//    }
 
     public function returnArrAllRowOfcolumnOftableSupplier($column) {
         $arr = array();

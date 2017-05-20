@@ -54,43 +54,7 @@ class Furniturestore_Supplier_Helper_Purchaseorder extends Mage_Core_Helper_Abst
         }
         return false;
     }
-//
-//    public function canCancel($id = null) {
-//        if (!$id) {
-//            $id = Mage::app()->getRequest()->getParam('id');
-//        }
-//        if ($purchaseOrderId = $id) {
-//            $purchaseOrder = Mage::getModel('inventorypurchasing/purchaseorder')->load($purchaseOrderId);
-//            $cancelDate = $purchaseOrder->getCanceledDate();
-//            $canCancel = 0;
-//            if (strtotime($cancelDate) <= strtotime(now())) {
-//                return false;
-//            }
-//            if ($this->haveDelivery($purchaseOrderId)) {
-//                return false;
-//            }
-//            $poStatus = $purchaseOrder->getStatus();
-//            if ($poStatus == 6) {
-//                return false;
-//            }
-//        }
-//        return true;
-//    }
-//
-//    public function canWaittingDelivery($id = null) {
-//        if (!$id) {
-//            $id = Mage::app()->getRequest()->getParam('id');
-//        }
-//        if ($purchaseOrderId = $id) {
-//            $purchaseOrder = Mage::getModel('inventorypurchasing/purchaseorder')->load($purchaseOrderId);
-//            $poStatus = $purchaseOrder->getStatus();
-//            if ($poStatus == 6) {
-//                return false;
-//            }
-//        }
-//        return true;
-//    }
-//
+
     public function getReturnOrderStatus() {
         return array(
             Furniturestore_Supplier_Model_Purchaseorder::PENDING_STATUS => Mage::helper('supplier')->__('Pending'),
@@ -124,55 +88,7 @@ class Furniturestore_Supplier_Helper_Purchaseorder extends Mage_Core_Helper_Abst
         $shippingArray['new'] = $this->__('Create a new shipping method');
         return $shippingArray;
     }
-//
-//    public function getPaymentTerms() {
-//        $paymentTerms = Mage::getModel('inventorypurchasing/paymentterm')
-//                ->getCollection()
-//                ->addFieldToFilter('payment_term_status', 1);
-//        $paymentArray = array();
-//        $paymentArray[0] = $this->__('Select payment term');
-//        if (count($paymentTerms)) {
-//
-//            foreach ($paymentTerms as $payment) {
-//                $paymentArray[$payment->getId()] = $payment->getPaymentTermName();
-//            }
-//        }
-//        $paymentArray['new'] = $this->__('Create a new payment term');
-//        return $paymentArray;
-//    }
-//
-//    public function getShippingMethodForSupplier() {
-//        $shippingMethods = Mage::getModel('inventorypurchasing/shippingmethod')
-//                ->getCollection()
-//                ->addFieldToFilter('shipping_method_status', 1);
-//        if (count($shippingMethods)) {
-//            $shippingArray = array();
-//            $shippingArray[0] = $this->__('Select shipping method');
-//            foreach ($shippingMethods as $shipping) {
-//                $shippingArray[$shipping->getId()] = $shipping->getShippingMethodName();
-//            }
-//            return $shippingArray;
-//        } else {
-//            return '';
-//        }
-//    }
-//
-//    public function getPaymentTermsForSupplier() {
-//        $paymentTerms = Mage::getModel('inventorypurchasing/paymentterm')
-//                ->getCollection()
-//                ->addFieldToFilter('payment_term_status', 1);
-//        if (count($paymentTerms)) {
-//            $paymentArray = array();
-//            $paymentArray[0] = $this->__('Select payment term');
-//            foreach ($paymentTerms as $payment) {
-//                $paymentArray[$payment->getId()] = $payment->getPaymentTermName();
-//            }
-//            return $paymentArray;
-//        } else {
-//            return '';
-//        }
-//    }
-//
+
     public function getOrderPlaced() {
         return array(
             1 => Mage::helper('supplier')->__('Email'),
@@ -236,31 +152,7 @@ class Furniturestore_Supplier_Helper_Purchaseorder extends Mage_Core_Helper_Abst
             Mage::getModel('admin/session')->setData('purchaseorder_product_import', $data);
         }
     }
-//
-//    public function getBilingAddressByPurchaseOrderId($purchaseOrderId) {
-//        $purchaseOrderModel = Mage::getModel('inventorypurchasing/purchaseorder')->load($purchaseOrderId);
-//        $supplierId = $purchaseOrderModel->getSupplierId();
-//        $supplierModel = Mage::getModel('inventorypurchasing/supplier')->load($supplierId);
-//        $supplierField = '';
-//        if ($supplierModel->getId()) {
-//            $data = $supplierModel->getData();
-//            $countryLists = Mage::getModel('directory/country')->getResourceCollection()->loadByStore()->toOptionArray(true);
-//            $countryList = array();
-//            foreach ($countryLists as $county) {
-//                $countryList[$county['value']] = $county['label'];
-//            }
-//            $supplierField = "<br/>" . $data['street'];
-//            $supplierField .= "<br/>" . $data['city'];
-//            if (isset($data['state'])) {
-//                $supplierField .= ", " . $data['state'];
-//            }
-//            $supplierField .= ", " . $data['postcode'];
-//            $supplierField .= "<br/>" . $countryList[$data['country_id']];
-//            $supplierField .= "<br />" . $this->__('T: ') . $data['telephone'];
-//        }
-//        return $supplierField;
-//    }
-//
+
     public function importDeliveryProduct($data) {
         if (count($data)) {
             Mage::getModel('admin/session')->setData('delivery_purchaseorder_product_import', $data);
@@ -272,34 +164,6 @@ class Furniturestore_Supplier_Helper_Purchaseorder extends Mage_Core_Helper_Abst
             Mage::getModel('admin/session')->setData('returnorder_product_import', $data);
         }
     }
-//
-//    /**
-//     * Get receiving purchase order Ids
-//     *
-//     * @return array
-//     */
-//    public function getAwaitingPOids($supplierIds = array()) {
-//        $poIds = array();
-//        $pos = Mage::getResourceModel('inventorypurchasing/purchaseorder_collection')
-//                ->addFieldToFilter('status', array('in' => array(
-//                    Magestore_Inventorypurchasing_Model_Purchaseorder::PENDING_STATUS,
-//                    Magestore_Inventorypurchasing_Model_Purchaseorder::WAITING_APPROVE_STATUS,
-//                    Magestore_Inventorypurchasing_Model_Purchaseorder::WAITING_CONFIRM_STATUS,
-//                    Magestore_Inventorypurchasing_Model_Purchaseorder::AWAITING_DELIVERY_STATUS,
-//                    Magestore_Inventorypurchasing_Model_Purchaseorder::RECEIVING_STATUS
-//                )))
-//                ->addFieldToFilter('trash', Magestore_Inventorypurchasing_Model_Purchaseorder::IS_NOT_TRASH);
-//        if(count($supplierIds)) {
-//            $pos->addFieldToFilter('supplier_id', array('in' => $supplierIds));
-//        }
-//        if(count($pos)) {
-//            foreach($pos as $po) {
-//                $poIds[] = $po->getId();
-//            }
-//        }
-//        return $poIds;
-//    }
-//
 
     public function isPOCancelOutdate(Furniturestore_Supplier_Model_Purchaseorder $po) {
         if (empty($po)) {
@@ -320,14 +184,10 @@ class Furniturestore_Supplier_Helper_Purchaseorder extends Mage_Core_Helper_Abst
         }
         return false;
     }
-//
-//    /**
-//     * get payment status
-//     */
+
     public function getPaymentStatus() {
         return array(
             0 => Mage::helper('supplier')->__('Not Paid'),
-//            2 => Mage::helper('supplier')->__('Partial Paid'),
             1 => Mage::helper('supplier')->__('Paid')
         );
     }

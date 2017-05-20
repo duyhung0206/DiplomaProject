@@ -35,6 +35,12 @@ class Furniturestore_Supplier_Block_Adminhtml_Supplier_Edit_Tab_Form extends Mag
             'name' => 'supplier_name',
         ));
 
+        $fieldset->addField('user_admin', 'text', array(
+            'label' => Mage::helper('supplier')->__('User account admin'),
+            'required' => true,
+            'name' => 'user_admin'
+        ));
+
         $fieldset->addField('contact_name', 'text', array(
             'label' => Mage::helper('supplier')->__('Contact Person'),
             'class' => 'required-entry',
@@ -44,8 +50,8 @@ class Furniturestore_Supplier_Block_Adminhtml_Supplier_Edit_Tab_Form extends Mag
 
         $fieldset->addField('supplier_email', 'text', array(
             'label' => Mage::helper('supplier')->__('Email'),
-            // 'class' => 'required-entry',
-            // 'required' => true,
+             'class' => 'required-entry',
+             'required' => true,
             'name' => 'supplier_email',
         ));
 
@@ -112,23 +118,32 @@ class Furniturestore_Supplier_Block_Adminhtml_Supplier_Edit_Tab_Form extends Mag
             'values' => Mage::getSingleton('supplier/status')->getOptionHash(),
         ));
 
-        if (Mage::getStoreConfig('supplier/supplier_group/enable_dropship')) {
-            $fieldset2 = $form->addFieldset('supplierpass_form', array(
-                'legend' => Mage::helper('supplier')->__('Password Management')
-            ));
+        $fieldset2 = $form->addFieldset('supplierpass_form', array(
+            'legend' => Mage::helper('supplier')->__('Password Management')
+        ));
 
-            $fieldset2->addField('new_password', 'text', array(
-                'label' => Mage::helper('supplier')->__('New Password'),
+        $fieldset2->addField('new_password', 'text', array(
+            'label' => Mage::helper('supplier')->__('New Password'),
+            'required' => false,
+            'name' => 'new_password',
+        ));
+
+        $fieldset2->addField('auto_general_password', 'checkbox', array(
+            'label' => Mage::helper('supplier')->__('Auto-generated password'),
+            'required' => false,
+            'name' => 'auto_general_password',
+        ));
+
+        $actionName = Mage::app()->getRequest()->getBeforeForwardInfo()['action_name'];
+        if($actionName == 'new'){
+            $fieldset2->addField('send_mail', 'checkbox', array(
+                'label' => Mage::helper('supplier')->__('Send new password to supplier'),
                 'required' => false,
-                'name' => 'new_password',
+                'name' => 'send_mail',
+                'checked' => 'true',
+                'disabled' => 'true',
             ));
-
-            $fieldset2->addField('auto_general_password', 'checkbox', array(
-                'label' => Mage::helper('supplier')->__('Auto-generated password'),
-                'required' => false,
-                'name' => 'auto_general_password',
-            ));
-
+        }else{
             $fieldset2->addField('send_mail', 'checkbox', array(
                 'label' => Mage::helper('supplier')->__('Send new password to supplier'),
                 'required' => false,

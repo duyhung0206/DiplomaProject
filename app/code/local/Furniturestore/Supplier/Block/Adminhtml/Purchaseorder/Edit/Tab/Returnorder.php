@@ -42,26 +42,32 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Edit_Tab_Returnorder
         $totalProductRecieved = Mage::helper('supplier/purchaseorder')->getDataByPurchaseOrderId($this->getRequest()->getParam('id'), 'total_products_recieved');
         $purchaseOrderId = $this->getRequest()->getParam('id');
         $purchaseOrder = Mage::getModel('supplier/purchaseorder')->load($purchaseOrderId);
-        if (($totalProductRecieved > 0) && $this->checkCreateReturn()) {
-            $this->setChild('return_order_button', $this->getLayout()->createBlock('adminhtml/widget_button')
-                            ->setData(array(
-                                'label' => Mage::helper('supplier')->__('Return Order'),
-                                'onclick' => 'setLocation(\'' . $this->getUrl('*/*/newreturnorder', array('purchaseorder_id' => $this->getRequest()->getParam('id'), 'action' => 'newreturnorder', '_current' => false)) . '\')',
-                                'class' => 'add',
-                                'style' => 'float:right'
-                            ))
-            );
+
+        $admin = Mage::getSingleton('admin/session')->getUser();
+        $roleData = Mage::getModel('admin/user')->load($admin->getUserId())->getRole();
+        if($roleData->getRoleName() != 'Role for supplier'){
+            if (($totalProductRecieved > 0) && $this->checkCreateReturn()) {
+                $this->setChild('return_order_button', $this->getLayout()->createBlock('adminhtml/widget_button')
+                    ->setData(array(
+                        'label' => Mage::helper('supplier')->__('Return Order'),
+                        'onclick' => 'setLocation(\'' . $this->getUrl('*/*/newreturnorder', array('purchaseorder_id' => $this->getRequest()->getParam('id'), 'action' => 'newreturnorder', '_current' => false)) . '\')',
+                        'class' => 'add',
+                        'style' => 'float:right'
+                    ))
+                );
+            }
+            if ($totalProductRecieved > 0 && $this->checkCreateReturnAll()) {
+                $this->setChild('return_all_order_button', $this->getLayout()->createBlock('adminhtml/widget_button')
+                    ->setData(array(
+                        'label' => Mage::helper('supplier')->__('Return All Orders'),
+                        'onclick' => 'setLocation(\'' . $this->getUrl('*/*/returnallorder', array('purchaseorder_id' => $this->getRequest()->getParam('id'), 'action' => 'newreturnorder', '_current' => false)) . '\')',
+                        'class' => 'add',
+                        'style' => 'float:right'
+                    ))
+                );
+            }
         }
-        if ($totalProductRecieved > 0 && $this->checkCreateReturnAll()) {
-            $this->setChild('return_all_order_button', $this->getLayout()->createBlock('adminhtml/widget_button')
-                            ->setData(array(
-                                'label' => Mage::helper('supplier')->__('Return All Orders'),
-                                'onclick' => 'setLocation(\'' . $this->getUrl('*/*/returnallorder', array('purchaseorder_id' => $this->getRequest()->getParam('id'), 'action' => 'newreturnorder', '_current' => false)) . '\')',
-                                'class' => 'add',
-                                'style' => 'float:right'
-                            ))
-            );
-        }
+
         $this->setChild('print_receipt_return_button', $this->getLayout()->createBlock('adminhtml/widget_button')
                         ->setData(array(
                             'label' => Mage::helper('supplier')->__('Print returned Items'),

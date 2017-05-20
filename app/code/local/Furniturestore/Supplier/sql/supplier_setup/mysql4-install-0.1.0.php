@@ -27,6 +27,8 @@ $installer->startSetup();
 $installer->run("	
 	CREATE TABLE IF NOT EXISTS {$this->getTable('furniturestore_supplier')} (
 		`supplier_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+		`user_id` int(11) unsigned NOT NULL,	
+		`user_admin` varchar(255) NOT NULL default '',
 		`supplier_name` varchar(255) NOT NULL default '',
 		`contact_name` varchar(255),
 		`supplier_email` varchar(255) NOT NULL default '',
@@ -44,14 +46,8 @@ $installer->run("
 		`created_time` DATETIME default NULL,
 		`updated_time` DATETIME default NULL,
 		`supplier_status` tinyint(1) NOT NULL default '1',     
-		`total_order` decimal(10,0) NOT NULL default '0',
-                `purchase_order` decimal(12,4) NOT NULL default '0',
-                `return_order` decimal(12,4) NOT NULL default '0',
-		`last_purchase_order` date default NULL,
-		`ship_via` int(11) default 0,
-        `payment_term` int(11) default 0,
-        `password_hash` varchar(255) default '',
-		PRIMARY KEY(`supplier_id`)
+		PRIMARY KEY(`supplier_id`),
+		FOREIGN KEY (`user_id`) REFERENCES {$this->getTable('admin_user')}(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
 	)ENGINE=InnoDB DEFAULT CHARSET=utf8;
         
 	CREATE TABLE IF NOT EXISTS {$this->getTable('furniturestore_supplier_product')}(

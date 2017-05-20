@@ -324,6 +324,20 @@ class Furniturestore_Supplier_Block_Adminhtml_Purchaseorder_Edit extends Mage_Ad
                 TINY.box.show(url,1, 800, 400, 1);
             }   
         ";
+
+        $admin = Mage::getSingleton('admin/session')->getUser();
+        $roleData = Mage::getModel('admin/user')->load($admin->getUserId())->getRole();
+        if($roleData->getRoleName() == 'Role for supplier'){
+            $this->_removeButton('mark_as_paid');
+            $this->_removeButton('complete_button');
+            $this->_removeButton('move_to_trash');
+            $this->_removeButton('resend_email');
+            $this->_removeButton('confirm_button');
+            $this->_removeButton('request_confirm_button');
+            $this->_removeButton('saveandcontinue');
+            $this->_removeButton('cancel_order_button');
+            $this->_removeButton('save');
+        }
     }
 
     /**
